@@ -1,0 +1,52 @@
+# Render Blueprint for Agent-Readiness Auditor.
+#
+# Free stack (no credit card, no Redis, no Celery worker):
+#   - auditor-backend  : FastAPI (docker/Dockerfile.backend), JOB_MODE=inline so
+#                        audits run as in-process background tasks.
+#   - auditor-frontend : Next.js standalone (docker/Dockerfile.frontend) which
+#                        proxies /api/* to the backend, giving ONE public URL.
+#   - PostgreSQL       : external (e.g. Neon free) via DATABASE_URL secret.
+#
+# Public URLs (predictable from the service names):
+#   https://auditor-frontend.onrender.com  (single entry point)
+#   https://auditor-backend.onrender.com   (API + /docs)
+services:
+  - type: web
+    name: auditor-backend
+    runtime: docker
+    repo: https://github.com/abdertalibi-gif/Agent_readiness_auditor
+    dockerfilePath: docker/Dockerfile.backend
+    dockerContext: .
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: JOB_MODE
+        value: inline
+      - key: FRONTEND_URL
+        value: https://auditor-frontend.onrender.com
+      - key: CORS_ORIGINS
+        value: https://auditor-frontend.onrender.com
+      - key: ALLOW_PRIVATE_IP_RANGES
+        value: "false"
+      - key: AI_PROVIDER
+        value: none
+
+  - type: web
+    name: auditor-frontend
+    runtime: docker
+    repo: https://github.com/abdertalibi-gif/Agent_readiness_auditor
+    dockerfilePath: docker/Dockerfile.frontend
+    dockerContext: .
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: BACKEND_INTERNAL_URL
+        value: https://auditor-backend.onrender.com
