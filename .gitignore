@@ -1,0 +1,43 @@
+# Environment
+.env
+.env.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+.next-env.d.ts
+
+# Database / data
+*.db
+*.sqlite
+data/
+
+# Reports / artifacts
+*.pdf
+*.html.bak
+
+# Logs
+*.log
+logs/
+
+# Editor / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
