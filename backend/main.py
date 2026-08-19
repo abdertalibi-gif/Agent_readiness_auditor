@@ -5,5 +5,8 @@ The canonical FastAPI app object lives in `app.main`.
 """
 
 from app.main import app
+from fastapi import FastAPI
+
+app = FastAPI()
 
 __all__ = ["app"]
