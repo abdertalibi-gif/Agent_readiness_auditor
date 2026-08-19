@@ -113,13 +113,13 @@ export function AuditIssues({ auditId }: { auditId: string }) {
 }
 
 function IssueCard({ issue }: { issue: Check }) {
-  const { t, statusLabel } = useI18n();
+  const { t, statusLabel, checkText } = useI18n();
   const [expanded, setExpanded] = useState(false);
   return (
     <Card>
       <CardHeader className="pb-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <CardTitle className="text-base">{issue.name}</CardTitle>
+          <CardTitle className="text-base">{checkText(issue.name)}</CardTitle>
           <div className="flex shrink-0 gap-2">
             <Badge variant={SEVERITY_COLORS[issue.severity] ?? "secondary"}>{t(`severity.${issue.severity}`)}</Badge>
             <Badge variant={STATUS_COLORS[issue.status] ?? "outline"}>{statusLabel(issue.status)}</Badge>
@@ -127,7 +127,7 @@ function IssueCard({ issue }: { issue: Check }) {
         </div>
       </CardHeader>
       <CardContent>
-        {issue.description && <p className="text-sm text-muted-foreground">{issue.description}</p>}
+        {issue.description && <p className="text-sm text-muted-foreground">{checkText(issue.description)}</p>}
 
         <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
           <span>
@@ -146,13 +146,13 @@ function IssueCard({ issue }: { issue: Check }) {
             {issue.why_matters && (
               <div className="rounded-md bg-muted/60 p-3">
                 <div className="font-semibold">{t("auditDetail.whyItMatters")}</div>
-                <p className="mt-1 text-muted-foreground">{issue.why_matters}</p>
+                <p className="mt-1 text-muted-foreground">{checkText(issue.why_matters)}</p>
               </div>
             )}
             {issue.recommendation && (
               <div className="rounded-md bg-muted/60 p-3">
                 <div className="font-semibold">{t("auditDetail.recommendedFix")}</div>
-                <p className="mt-1 text-muted-foreground">{issue.recommendation}</p>
+                <p className="mt-1 text-muted-foreground">{checkText(issue.recommendation)}</p>
               </div>
             )}
             {issue.ai_explanation && (

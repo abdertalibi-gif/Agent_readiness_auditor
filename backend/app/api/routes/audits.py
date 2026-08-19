@@ -201,6 +201,7 @@ async def get_recommendations(
 async def get_report(
     audit: Audit = Depends(get_audit_or_anonymous),
     session: AsyncSession = Depends(get_db_session),
+    lang: str | None = Query(default=None, description="Report language: en, fr or ar."),
 ) -> Response:
     if audit.status not in ("COMPLETED", "PARTIAL", "FAILED"):
         raise HTTPException(status_code=409, detail="Report is not available until the audit finishes.")
@@ -208,7 +209,7 @@ async def get_report(
     from app.services.report_service import generate_report_pdf
 
     try:
-        pdf_bytes = await generate_report_pdf(session, audit)
+        pdf_bytes = await generate_report_pdf(session, audit, language=lang or "en")
     except Exception:  # noqa: BLE001
         logger.exception("report generation failed for audit_id=%s", audit.id)
         raise HTTPException(
@@ -221,7 +222,7 @@ async def get_report(
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="agent-readiness-report-{audit.id[:8]}.pdf"'},
+        headers={"Content-Disposition": f'attachment; filename="agent-readiness-report-{audit.id[:8]}-{lang or "en"}.pdf"'},
     )
 
 

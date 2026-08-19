@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 
 export default function ReportsPage() {
-  const { t, ratingLabel, confidenceLabel, formatDate, formatNumber } = useI18n();
+  const { t, ratingLabel, confidenceLabel, formatDate, formatNumber, locale } = useI18n();
   const [audits, setAudits] = useState<AuditOut[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -104,7 +104,7 @@ export default function ReportsPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => {
-                            downloadReport(audit.id).catch(() => {
+                            downloadReport(audit.id, locale).catch(() => {
                               toast.error(t("reports.downloadError"));
                             });
                           }}

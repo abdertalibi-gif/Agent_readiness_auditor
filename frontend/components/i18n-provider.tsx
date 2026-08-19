@@ -16,6 +16,7 @@ import {
   loadLocaleMessages,
   normalizeLocale,
   translate,
+  translateText,
   type Locale,
 } from "@/lib/i18n";
 import {
@@ -65,6 +66,7 @@ export interface I18nValue {
   statusLabel: (status: string) => string;
   severityLabel: (severity: string) => string;
   priorityLabel: (priority: string) => string;
+  checkText: (english: string) => string;
   setLocale: (locale: Locale) => void;
 }
 
@@ -139,6 +141,11 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
     [locale]
   );
 
+  const checkText = useCallback(
+    (english: string) => translateText(locale, english),
+    [locale]
+  );
+
   const value = useMemo<I18nValue>(
     () => ({
       locale,
@@ -152,9 +159,10 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
       statusLabel: (status: string) => statusLabelLocale(status, locale),
       severityLabel: (severity: string) => severityLabelLocale(severity, locale),
       priorityLabel: (priority: string) => priorityLabelLocale(priority, locale),
+      checkText,
       setLocale,
     }),
-    [locale, t, setLocale]
+    [locale, t, checkText, setLocale]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

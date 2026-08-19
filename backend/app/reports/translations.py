@@ -164,6 +164,42 @@ PDF_TEXT: dict[str, dict[str, str]] = {
             "تنبيه قانوني مهم: هذا التقرير تحليل تقني آلي ولا يُعدّ استشارة قانونية مهنية."
         ),
     },
+    "legal_notice_gpsr": {
+        "en": (
+            "Important legal notice: This report is an automated assessment of the compliance of "
+            "product listings with the online product display requirements set out in Article 19 of "
+            "the European General Product Safety Regulation (EU) 2023/988 (GPSR).<br/><br/>"
+            "This assessment identifies potential issues in product data based on the evidence and "
+            "publicly available information found on the product page.<br/><br/>"
+            "This assessment is not legal advice and does not represent an official approval or "
+            "endorsement from any regulatory body.<br/><br/>"
+            "The merchant remains responsible for ensuring full compliance with all applicable "
+            "legal, technical and regulatory requirements."
+        ),
+        "fr": (
+            "Avis juridique important : ce rapport est une évaluation automatisée de la conformité "
+            "des fiches produits aux exigences d'affichage en ligne des produits prévues à l'article 19 "
+            "du règlement européen relatif à la sécurité générale des produits (UE) 2023/988 (GPSR).<br/><br/>"
+            "Cette évaluation identifie les problèmes potentiels dans les données produit sur la base "
+            "des preuves et des informations publiques trouvées sur la page produit.<br/><br/>"
+            "Cette évaluation ne constitue pas un avis juridique et ne représente pas une approbation "
+            "ou un aval officiel d'un organisme de réglementation.<br/><br/>"
+            "Le commerçant reste responsable d'assurer la pleine conformité à toutes les exigences "
+            "légales, techniques et réglementaires applicables."
+        ),
+        "ar": (
+            "تنبيه قانوني مهم:<br/><br/>"
+            "هذا التقرير عبارة عن تقييم آلي لمدى امتثال قوائم المنتجات لمتطلبات عرض المنتجات عبر "
+            "الإنترنت المنصوص عليها في المادة 19 من اللائحة الأوروبية للسلامة العامة للمنتجات "
+            "(EU) 2023/988 (GPSR).<br/><br/>"
+            "يحدد هذا التقييم المشكلات المحتملة في بيانات المنتج استنادًا إلى الأدلة والمعلومات "
+            "العامة التي تم اكتشافها في صفحة المنتج.<br/><br/>"
+            "هذا التقييم لا يُعدّ استشارة قانونية ولا يمثل موافقة أو اعتمادًا رسميًا من أي جهة "
+            "تنظيمية.<br/><br/>"
+            "يبقى التاجر مسؤولًا عن ضمان الامتثال الكامل لجميع المتطلبات القانونية والفنية "
+            "والتنظيمية المعمول بها."
+        ),
+    },
     "cat_table_header": {
         "en": "Category",
         "fr": "Catégorie",

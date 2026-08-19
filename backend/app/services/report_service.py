@@ -8,12 +8,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Audit, AuditCheck, Page, Recommendation
 from app.reports.pdf import build_pdf, now_iso
+from app.reports.translations import norm_lang
 
 logger = logging.getLogger("auditor.reports")
 
 
-async def generate_report_pdf(session: AsyncSession, audit: Audit) -> bytes:
-    """Build the full report payload from the audit's persisted data and render PDF."""
+async def generate_report_pdf(session: AsyncSession, audit: Audit, language: str = "en") -> bytes:
+    """Build the full report payload from the audit's persisted data and render PDF.
+
+    ``language`` selects the report language (``en``, ``fr`` or ``ar``). Check
+    names, descriptions, recommendations and structured values are translated
+    at render time; no stored data is modified.
+    """
+
+    lang = norm_lang(language)
 
     checks = (
         (await session.scalars(select(AuditCheck).where(AuditCheck.audit_id == audit.id))).all()
@@ -91,7 +99,7 @@ async def generate_report_pdf(session: AsyncSession, audit: Audit) -> bytes:
     # build_pdf is CPU-bound (ReportLab layout + rendering). Running it on the
     # event loop would block every other request for the whole render; offload
     # it to the default executor so the API stays responsive.
-    return await asyncio.to_thread(build_pdf, data)
+    return await asyncio.to_thread(build_pdf, data, lang)
 
 
 def _evidence_text(check: AuditCheck) -> str:

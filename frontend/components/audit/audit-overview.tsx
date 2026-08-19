@@ -35,7 +35,7 @@ const STATUS_BADGE: Record<string, "default" | "success" | "destructive" | "seco
 };
 
 export function AuditOverview({ auditId }: { auditId: string }) {
-  const { t, formatDate, formatNumber, statusLabel } = useI18n();
+  const { t, formatDate, formatNumber, statusLabel, locale } = useI18n();
   const { audit } = useAuditStatus(auditId, 5000);
   const { summary, loading, error, refresh } = useAuditSummary(auditId, true);
 
@@ -83,7 +83,7 @@ export function AuditOverview({ auditId }: { auditId: string }) {
           <Button variant="outline" size="sm" onClick={refresh}>
             <RefreshCw className="h-4 w-4" /> {t("auditDetail.refresh")}
           </Button>
-          <Button size="sm" onClick={() => downloadReport(auditId)} disabled={!summary}>
+          <Button size="sm" onClick={() => downloadReport(auditId, locale)} disabled={!summary}>
             <Download className="h-4 w-4" /> {t("auditDetail.pdfReport")}
           </Button>
         </div>

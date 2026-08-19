@@ -37,7 +37,7 @@ function statusVariant(status: string): "success" | "warning" | "destructive" | 
 }
 
 export function AuditChecks({ auditId }: { auditId: string }) {
-  const { t, categoryLabel, statusLabel, severityLabel, confidenceLabel, formatNumber } = useI18n();
+  const { t, categoryLabel, statusLabel, severityLabel, confidenceLabel, formatNumber, checkText } = useI18n();
   const { audit } = useAuditStatus(auditId, 6000);
   const { summary } = useAuditSummary(auditId, true);
   const [checks, setChecks] = useState<Check[]>([]);
@@ -136,10 +136,10 @@ export function AuditChecks({ auditId }: { auditId: string }) {
                       return (
                         <TableRow key={check.id}>
                           <TableCell className="max-w-[300px]">
-                            <div className="font-medium">{check.name}</div>
+                            <div className="font-medium">{checkText(check.name)}</div>
                             {check.description && (
                               <div className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
-                                {check.description}
+                                {checkText(check.description)}
                               </div>
                             )}
                           </TableCell>

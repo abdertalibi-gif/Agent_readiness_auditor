@@ -115,3 +115,19 @@ export function translate(
   if (fallback !== undefined) return interpolate(fallback, values);
   return path;
 }
+
+/**
+ * Translate an English string produced by the backend (check names,
+ * descriptions, recommendations). The lookup key is the full English string,
+ * so it must NOT go through the dot-path lookup in `translate()` (many strings
+ * contain periods). Unmatched strings fall back to the English source.
+ */
+export function translateText(locale: Locale, english: string): string {
+  if (!english) return english;
+  const dict = loadedMessages[locale];
+  const node = dict?.checkText;
+  if (node && typeof node === "object" && typeof node[english] === "string") {
+    return node[english];
+  }
+  return english;
+}

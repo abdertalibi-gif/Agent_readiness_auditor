@@ -18,7 +18,7 @@ const PRIORITY_COLORS: Record<string, "destructive" | "warning" | "secondary" | 
 };
 
 export function AuditRecommendations({ auditId }: { auditId: string }) {
-  const { t, priorityLabel } = useI18n();
+  const { t, priorityLabel, checkText } = useI18n();
   const { audit } = useAuditStatus(auditId, 6000);
   const [recs, setRecs] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +58,7 @@ export function AuditRecommendations({ auditId }: { auditId: string }) {
                 <div className="flex items-start justify-between gap-3">
                   <CardTitle className="text-base">
                     <span className="mr-2 text-muted-foreground">{i + 1}.</span>
-                    {rec.title}
+                    {checkText(rec.title)}
                   </CardTitle>
                   <div className="flex shrink-0 gap-2">
                     <Badge variant={PRIORITY_COLORS[rec.priority] ?? "secondary"}>{priorityLabel(rec.priority)}</Badge>
@@ -68,11 +68,11 @@ export function AuditRecommendations({ auditId }: { auditId: string }) {
                 </div>
               </CardHeader>
               <CardContent className="space-y-2 text-sm">
-                {rec.description && <p className="text-muted-foreground">{rec.description}</p>}
+                {rec.description && <p className="text-muted-foreground">{checkText(rec.description)}</p>}
                 {rec.how_to_fix && (
                   <div className="rounded-md bg-muted/60 p-3">
                     <span className="font-semibold">{t("auditDetail.howToFix")} </span>
-                    <span className="text-muted-foreground">{rec.how_to_fix}</span>
+                    <span className="text-muted-foreground">{checkText(rec.how_to_fix)}</span>
                   </div>
                 )}
               </CardContent>

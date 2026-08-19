@@ -478,14 +478,15 @@ export const api = {
   },
 };
 
-export async function downloadReport(id: string) {
+export async function downloadReport(id: string, lang: string = "en") {
   // The report endpoint requires authentication, so it is fetched with the
-  // bearer token and served as a local blob download.
+  // bearer token and served as a local blob download. `lang` selects the PDF
+  // language (en | fr | ar); the server falls back to English for unknown values.
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   let res: Response;
   try {
-    res = await fetch(`${API_BASE}/audits/${id}/report`, {
+    res = await fetch(`${API_BASE}/audits/${id}/report?lang=${encodeURIComponent(lang)}`, {
       headers: { ...authHeaders() },
       signal: controller.signal,
     });
@@ -511,7 +512,7 @@ export async function downloadReport(id: string) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = `agent-readiness-report-${id.slice(0, 8)}.pdf`;
+  anchor.download = `agent-readiness-report-${id.slice(0, 8)}-${lang}.pdf`;
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();

@@ -34,6 +34,16 @@ function ScoreBar({ score }: { score: number }) {
   );
 }
 
+function platformName(platform: string, t: (k: string) => string): string {
+  const key = platform.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (key === "unknown") return t("audit.platform.unknown");
+  if (key === "wordpress") return "WordPress";
+  if (key === "shopify") return "Shopify";
+  if (key === "squarespace") return "Squarespace";
+  if (key === "wix") return "Wix";
+  return platform;
+}
+
 function CheckStatusBadge({ status }: { status: string }) {
   const variant =
     status === "PASS" ? "success" : status === "WARNING" ? "warning" : status === "FAIL" ? "destructive" : "outline";
@@ -44,7 +54,7 @@ function CheckStatusBadge({ status }: { status: string }) {
 }
 
 export function AuditReport({ auditId }: { auditId: string }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { audit } = useAuditStatus(auditId, 6000);
   const { summary, loading } = useAuditSummary(auditId, true);
   const [checks, setChecks] = useState<Check[]>([]);
@@ -100,7 +110,7 @@ export function AuditReport({ auditId }: { auditId: string }) {
             <Button onClick={() => window.print()}>
               <Printer className="h-4 w-4" /> {t("auditDetail.printSavePdf")}
             </Button>
-            <Button variant="outline" onClick={async () => { try { await downloadReport(auditId); } catch { toast.error(t("reports.downloadError")); } }}>
+            <Button variant="outline" onClick={async () => { try { await downloadReport(auditId, locale); } catch { toast.error(t("reports.downloadError")); } }}>
               <Download className="h-4 w-4" /> {t("auditDetail.downloadPdf")}
             </Button>
           </div>
@@ -127,7 +137,7 @@ function ReportBody({
   recs: Recommendation[];
   pages: PageOut[];
 }) {
-  const { t, formatDate, formatNumber, confidenceLabel, categoryLabel, severityLabel, priorityLabel } = useI18n();
+  const { t, formatDate, formatNumber, confidenceLabel, categoryLabel, severityLabel, priorityLabel, checkText } = useI18n();
   const score = summary.score;
   const pagesCrawled = summary.coverage?.pages ?? 0;
   const sortedChecks = [...checks].sort((a, b) => a.score - b.score);
@@ -163,7 +173,7 @@ function ReportBody({
           <Badge variant="outline">{t("audit.table.grade")}: {gradeFromScore(score)}</Badge>
           <Badge variant="outline">{t("audit.table.coverage")}: {t("audit.coverage.pagesCount", { count: formatNumber(pagesCrawled) })}</Badge>
           <Badge variant="outline">{t("audit.table.confidence")}: {confidenceLabel(pagesCrawled)}</Badge>
-          {summary.platform && <Badge variant="outline">{t("audit.platform.label")}: {summary.platform}</Badge>}
+          {summary.platform && <Badge variant="outline">{t("audit.platform.label")}: {platformName(summary.platform, t)}</Badge>}
         </div>
       </section>
 
@@ -196,8 +206,8 @@ function ReportBody({
             {[...critical, ...high].map((c) => (
               <div key={c.id} className="flex items-start justify-between gap-3 rounded-lg border p-3 text-sm">
                 <div>
-                  <div className="font-medium">{c.name}</div>
-                  <div className="text-xs text-slate-500">{typeof c.evidence === "string" ? c.evidence : (c.description ?? "")}</div>
+                  <div className="font-medium">{checkText(c.name)}</div>
+                  <div className="text-xs text-slate-500">{typeof c.evidence === "string" ? c.evidence : (checkText(c.description ?? "") ?? "")}</div>
                 </div>
                 <Badge variant={c.severity === "CRITICAL" ? "destructive" : "warning"}>{severityLabel(c.severity)}</Badge>
               </div>
@@ -224,7 +234,7 @@ function ReportBody({
               {sortedChecks.map((c) => (
                 <TableRow key={c.id}>
                   <TableCell className="max-w-[240px]">
-                    <div className="font-medium">{c.name}</div>
+                    <div className="font-medium">{checkText(c.name)}</div>
                     {typeof c.evidence === "string" && <div className="text-xs text-slate-500">{c.evidence}</div>}
                   </TableCell>
                   <TableCell className="text-xs">{categoryLabel(c.category)}</TableCell>
@@ -251,13 +261,13 @@ function ReportBody({
               <div key={r.id} className="rounded-lg border p-3 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="font-medium">
-                    {priorityLabel(r.priority)} — {r.title}
+                    {priorityLabel(r.priority)} — {checkText(r.title)}
                   </span>
                   <Badge variant={r.priority === "HIGH" ? "destructive" : r.priority === "MEDIUM" ? "warning" : "secondary"}>
                     {priorityLabel(r.priority)}
                   </Badge>
                 </div>
-                <p className="mt-1 text-xs text-slate-600">{r.description}</p>
+                <p className="mt-1 text-xs text-slate-600">{checkText(r.description ?? "")}</p>
               </div>
             ))}
           </div>
