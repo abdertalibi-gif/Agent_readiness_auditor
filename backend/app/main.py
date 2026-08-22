@@ -32,6 +32,17 @@ async def lifespan(_app: FastAPI):
                 "need the database will return a clear error until it is reachable.",
                 extra={"database_url": settings.database_url},
             )
+    # Recover audits stuck in QUEUED/RUNNING from a previous crash.
+    try:
+        from app.database import async_session_factory
+        from app.services.audit_service import recover_stale_audits
+
+        async with async_session_factory() as session:
+            recovered = await recover_stale_audits(session)
+            if recovered:
+                logger.info("recovered %d stale audit(s) on startup", recovered)
+    except Exception:  # noqa: BLE001 - startup must not fail if recovery fails
+        logger.exception("stale audit recovery failed during startup")
     if settings.app_env == "production" and (
         settings.secret_key in ("dev-secret-change-me", "change-me-in-production")
     ):
@@ -61,7 +72,7 @@ app.add_middleware(
     allow_origins=settings.cors_origin_list,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Anonymous-Audit-Id"],
+    allow_headers=["Content-Type", "Authorization", "X-Anonymous-Audit-Id", "Accept", "Accept-Language", "Content-Language", "X-Requested-With"],
 )
 
 app.include_router(api_router)

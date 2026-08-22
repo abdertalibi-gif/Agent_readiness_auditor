@@ -89,7 +89,11 @@ export function AuditProgress({ auditId }: { auditId: string }) {
             ) : (
               <Loader2 className="h-5 w-5 animate-spin text-primary" />
             )}
-            {t("auditDetail.auditInProgress")}
+            {isFailed
+              ? t("auditDetail.auditFailed")
+              : audit?.status === "CANCELLED"
+                ? t("auditDetail.auditCancelled")
+                : t("auditDetail.auditInProgress")}
           </CardTitle>        </CardHeader>
         <CardContent>
           <p className="mb-4 truncate text-sm text-muted-foreground">{audit?.target_url ?? auditId}</p>

@@ -5,6 +5,7 @@ persist). All user-facing error messages are safe and generic; detailed errors
 go to structured logs, never to users.
 """
 
+import asyncio
 import logging
 import math
 import time
@@ -198,7 +199,25 @@ async def run_audit_job(audit_id: str) -> None:
             logger.error("audit job referenced missing audit_id=%s", audit_id)
             return
         try:
-            await _execute_audit(session, audit)
+            await asyncio.wait_for(
+                _execute_audit(session, audit),
+                timeout=settings.audit_max_seconds,
+            )
+        except asyncio.TimeoutError:
+            step = getattr(audit, "_pipeline_step", None) or "unknown"
+            _log_audit_error(
+                audit_id, step, audit.target_url,
+                TimeoutError(f"audit exceeded {settings.audit_max_seconds}s limit"),
+            )
+            audit.status = "FAILED"
+            audit.failed_step = step
+            audit.error_message = "The audit took too long and was stopped. Please try again with fewer pages."
+            audit.completed_at = _now()
+            try:
+                await session.commit()
+            except Exception:  # noqa: BLE001
+                await session.rollback()
+                logger.exception("failed to persist timeout state for audit_id=%s", audit_id)
         except Exception as exc:  # noqa: BLE001 - the outer guard keeps the worker alive
             step = getattr(audit, "_pipeline_step", None) or "unknown"
             _log_audit_error(audit_id, step, audit.target_url, exc)
@@ -251,7 +270,14 @@ async def _execute_audit(session: AsyncSession, audit: Audit) -> None:
         elif stage == "crawling":
             audit._pipeline_step = "crawling_pages"
             await _set_progress(session, audit, "crawling", 4, "Crawling pages", percent=40)
-        await session.commit()
+        try:
+            await session.commit()
+        except Exception:  # noqa: BLE001
+            logger.warning("on_stage commit failed for audit_id=%s", audit.id, exc_info=True)
+            try:
+                await session.rollback()
+            except Exception:  # noqa: BLE001
+                pass
 
     async def on_page(crawled: int, total: int) -> None:
         nonlocal last_progress_commit
@@ -266,13 +292,17 @@ async def _execute_audit(session: AsyncSession, audit: Audit) -> None:
             percent=pct,
             pages_crawled=crawled,
         )
-        # Committing once per page is up to 50 writes for a full crawl; the
-        # progress bar only needs ~2 updates/second. Always flush the last page
-        # so the "crawled N pages" state is durable before analysis starts.
         now = time.monotonic()
         if crawled >= total or now - last_progress_commit >= 0.5:
             last_progress_commit = now
-            await session.commit()
+            try:
+                await session.commit()
+            except Exception:  # noqa: BLE001
+                logger.warning("on_page commit failed for audit_id=%s", audit.id, exc_info=True)
+                try:
+                    await session.rollback()
+                except Exception:  # noqa: BLE001
+                    pass
 
     last_progress_commit = time.monotonic()
 
@@ -499,9 +529,41 @@ async def cancel_audit(session: AsyncSession, audit_id: str) -> Audit | None:
     if audit.status in ("QUEUED", "RUNNING"):
         audit.status = "CANCELLED"
         audit.completed_at = _now()
+        audit.failed_step = getattr(audit, "_pipeline_step", None) or "unknown"
+        audit.error_message = "Audit cancelled by user."
         audit.progress_json = {**(audit.progress_json or {}), "stage": "cancelled", "message": "Audit cancelled."}
         await session.commit()
     return audit
+
+
+async def recover_stale_audits(session: AsyncSession) -> int:
+    """Mark audits stuck in QUEUED/RUNNING as FAILED on startup.
+
+    If the server crashed while an audit was in progress, those audits will
+    never finish. This function cleans them up so the UI doesn't show
+    'Audit en cours' forever.
+    """
+    stale = (
+        await session.scalars(
+            select(Audit).where(Audit.status.in_(["QUEUED", "RUNNING"]))
+        )
+    ).all()
+    count = 0
+    for audit in stale:
+        audit.status = "FAILED"
+        audit.failed_step = getattr(audit, "_pipeline_step", None) or "unknown"
+        audit.error_message = "The server restarted while this audit was running. Please try again."
+        audit.completed_at = _now()
+        audit.progress_json = {
+            **(audit.progress_json or {}),
+            "stage": "failed",
+            "message": "Server restarted — audit did not complete.",
+        }
+        count += 1
+    if count:
+        await session.commit()
+        logger.warning("recovered %d stale audit(s) stuck in QUEUED/RUNNING", count)
+    return count
 
 
 def _json_safe(value: Any) -> Any:

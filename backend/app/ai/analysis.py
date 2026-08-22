@@ -38,7 +38,13 @@ async def enrich_checks(checks: list[CheckResult]) -> None:
         except Exception:  # noqa: BLE001
             logger.exception("ai explanation failed for check %s", check.check_id)
 
-    await asyncio.gather(*(explain(c) for c in targets))
+    try:
+        await asyncio.wait_for(
+            asyncio.gather(*(explain(c) for c in targets)),
+            timeout=settings.ai_timeout_seconds,
+        )
+    except asyncio.TimeoutError:
+        logger.warning("ai enrich_checks timed out after %.1fs", settings.ai_timeout_seconds)
 
 
 async def generate_summary(

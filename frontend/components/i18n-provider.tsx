@@ -34,10 +34,10 @@ const STORAGE_KEY = "ara_locale";
 const COOKIE_KEY = "ara_locale";
 
 function readLocale(preferred?: string | null): Locale {
-  if (typeof window === "undefined") return normalizeLocale(preferred);
-  return normalizeLocale(
-    preferred ?? localStorage.getItem(STORAGE_KEY) ?? readLocaleCookie()
-  );
+  // During the initial render (server + hydration), use ONLY the server-provided
+  // preferred value. This guarantees the server and client render the same HTML.
+  // localStorage / cookie sync happens in a useEffect after hydration.
+  return normalizeLocale(preferred);
 }
 
 function readLocaleCookie(): string | null {
@@ -72,9 +72,35 @@ export interface I18nValue {
 
 const I18nContext = createContext<I18nValue | null>(null);
 
-export function I18nProvider({ children }: { children: React.ReactNode }) {
+export function I18nProvider({
+  children,
+  initialLocale,
+}: {
+  children: React.ReactNode;
+  initialLocale?: Locale;
+}) {
   const { user } = useAuth();
-  const [locale, setLocaleState] = useState<Locale>(() => readLocale());
+  const [locale, setLocaleState] = useState<Locale>(() =>
+    readLocale(initialLocale)
+  );
+
+  // After hydration, sync from localStorage/cookie so the user's persisted
+  // preference takes effect. This only runs on the client, after the initial
+  // render has matched the server.
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY) ?? readLocaleCookie();
+    if (stored) {
+      const normalized = normalizeLocale(stored);
+      // Ensure the cookie is always set so future SSR reads are consistent.
+      if (!readLocaleCookie()) {
+        setLocaleCookie(normalized);
+      }
+      if (normalized !== locale) {
+        requestAnimationFrame(() => setLocaleState(normalized));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Locale JSON files are loaded on demand (only English is bundled eagerly).
   // Kick off the load for the current locale as soon as the provider mounts so

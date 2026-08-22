@@ -4,7 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { UserPlus } from "lucide-react";
+import { ArrowLeft, UserPlus } from "lucide-react";
 
 import { useAuth } from "@/components/auth-provider";
 import { useI18n } from "@/components/i18n-provider";
@@ -64,6 +64,14 @@ function RegisterForm() {
   }
 
   return (
+    <>
+      <Link
+        href="/"
+        className="mb-4 inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        {t("common.backToHome")}
+      </Link>
     <Card>
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">{t("auth.registerTitle")}</CardTitle>
@@ -129,6 +137,7 @@ function RegisterForm() {
         </p>
       </CardContent>
     </Card>
+    </>
   );
 }
 

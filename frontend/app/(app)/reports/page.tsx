@@ -24,17 +24,19 @@ export default function ReportsPage() {
   const { t, ratingLabel, confidenceLabel, formatDate, formatNumber, locale } = useI18n();
   const [audits, setAudits] = useState<AuditOut[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
         const all = await api.listAudits();
         setAudits(all.filter((a) => a.status === "COMPLETED" || a.status === "PARTIAL"));
-      } catch {
-        // keep empty list
+      } catch (err) {
+        setLoadError(err instanceof Error ? err.message : t("reports.loadError"));
       }
       setLoading(false);
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -46,6 +48,31 @@ export default function ReportsPage() {
 
       {loading ? (
         <Skeleton className="h-80" />
+      ) : loadError ? (
+        <Card>
+          <CardContent className="py-14 text-center">
+            <p className="font-medium text-destructive">{loadError}</p>
+            <Button
+              variant="outline"
+              className="mt-3"
+              onClick={() => {
+                setLoadError(null);
+                setLoading(true);
+                (async () => {
+                  try {
+                    const all = await api.listAudits();
+                    setAudits(all.filter((a) => a.status === "COMPLETED" || a.status === "PARTIAL"));
+                  } catch (err) {
+                    setLoadError(err instanceof Error ? err.message : t("reports.loadError"));
+                  }
+                  setLoading(false);
+                })();
+              }}
+            >
+              {t("common.retry")}
+            </Button>
+          </CardContent>
+        </Card>
       ) : audits.length === 0 ? (
         <Card>
           <CardContent className="py-14 text-center">

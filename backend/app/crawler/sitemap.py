@@ -2,6 +2,7 @@
 
 import gzip
 import logging
+import time
 import xml.etree.ElementTree as ET
 from urllib.parse import urljoin, urlparse
 
@@ -15,6 +16,9 @@ _NS = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
 COMMON_SITEMAP_PATHS = ("/sitemap.xml", "/sitemap_index.xml", "/sitemap-index.xml", "/sitemap1.xml")
 
 MAX_PARSE_URLS = settings.max_urls_per_sitemap
+
+# Hard cap on total time spent fetching sitemaps (seconds).
+_SITEMAP_GLOBAL_TIMEOUT = 30.0
 
 
 async def fetch_sitemaps(
@@ -32,8 +36,22 @@ async def fetch_sitemaps(
         parsed = urlparse(base_url)
         sources = [f"{parsed.scheme}://{parsed.netloc}{p}" for p in COMMON_SITEMAP_PATHS]
 
+    # Cap sources to prevent unbounded iteration over huge sitemap indexes.
+    sources = sources[: settings.sitemap_max_sources]
+    start_time = time.monotonic()
+
     for source in sources:
         if len(urls) >= settings.max_urls_per_sitemap:
+            break
+        # Global time guard: sitemaps should not consume more time than the
+        # crawl itself.  If we've been at this for more than _SITEMAP_GLOBAL_TIMEOUT
+        # seconds we bail with whatever URLs we have so far.
+        if time.monotonic() - start_time > _SITEMAP_GLOBAL_TIMEOUT:
+            logger.warning(
+                "sitemap fetch aborted after %.1fs (got %d URLs)",
+                time.monotonic() - start_time,
+                len(urls),
+            )
             break
         try:
             found = await _load_sitemap(source, client=client, cache=cache, timeout=timeout)
@@ -54,8 +72,13 @@ async def _load_sitemap(
     client: "httpx.AsyncClient | None" = None,
     cache: "dict[tuple[str, str], object] | None" = None,
     timeout: float | None = None,
+    _depth: int = 0,
 ) -> list[str]:
     from app.config import settings
+
+    if _depth > 2:
+        logger.info("sitemap recursion depth exceeded for %s", url)
+        return []
 
     res = await fetch_url(
         url,
@@ -78,7 +101,7 @@ async def _load_sitemap(
         if tag == "sitemap":
             loc = _find_loc(elem)
             if loc:
-                found.extend(await _load_sitemap(urljoin(url, loc)))
+                found.extend(await _load_sitemap(urljoin(url, loc), _depth=_depth + 1))
         elif tag == "url":
             loc = _find_loc(elem)
             if loc:

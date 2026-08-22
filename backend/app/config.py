@@ -42,6 +42,8 @@ class Settings(BaseSettings):
     crawl_max_response_bytes: int = 5 * 1024 * 1024
     crawl_concurrency: int = 5
     max_urls_per_sitemap: int = 500
+    audit_max_seconds: float = 180.0  # hard cap per audit (crawl+analyze+score)
+    sitemap_max_sources: int = 20  # max sitemaps to fetch per audit
 
     # SSRF protection
     allow_private_ip_ranges: bool = False

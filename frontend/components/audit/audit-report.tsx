@@ -60,6 +60,7 @@ export function AuditReport({ auditId }: { auditId: string }) {
   const [checks, setChecks] = useState<Check[]>([]);
   const [recs, setRecs] = useState<Recommendation[]>([]);
   const [pages, setPages] = useState<PageOut[]>([]);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -110,8 +111,21 @@ export function AuditReport({ auditId }: { auditId: string }) {
             <Button onClick={() => window.print()}>
               <Printer className="h-4 w-4" /> {t("auditDetail.printSavePdf")}
             </Button>
-            <Button variant="outline" onClick={async () => { try { await downloadReport(auditId, locale); } catch { toast.error(t("reports.downloadError")); } }}>
-              <Download className="h-4 w-4" /> {t("auditDetail.downloadPdf")}
+            <Button
+              variant="outline"
+              disabled={downloading}
+              onClick={async () => {
+                try {
+                  setDownloading(true);
+                  await downloadReport(auditId, locale);
+                } catch {
+                  toast.error(t("reports.downloadErrorDetail"));
+                } finally {
+                  setDownloading(false);
+                }
+              }}
+            >
+              <Download className="h-4 w-4" /> {downloading ? t("auditDetail.generatingPdf") : t("auditDetail.downloadPdf")}
             </Button>
           </div>
 

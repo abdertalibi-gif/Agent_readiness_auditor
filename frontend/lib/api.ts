@@ -37,7 +37,7 @@ export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhos
 const REQUEST_TIMEOUT_MS = 30_000;
 
 export const CONNECTION_ERROR_MESSAGE =
-  "Unable to connect to the server. Please make sure the backend is running.";
+  "Unable to reach the server. Please check that the backend is running on http://localhost:8000 and try again.";
 
 function isConnectionError(err: unknown): boolean {
   // AbortError = our timeout fired. TypeError = fetch network failure
@@ -119,13 +119,23 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
           window.location.assign("/login");
         }
       }
-      let detail = `Request failed (${res.status})`;
+      let detail: string | undefined;
       try {
         const body = await res.json();
         if (typeof body?.detail === "string") detail = body.detail;
       } catch {
-        // keep default message
+        // body not JSON
       }
+      const fallbackMessages: Record<number, string> = {
+        401: "Your session has expired. Please sign in again.",
+        403: "You don't have permission to perform this action.",
+        404: "The requested resource was not found.",
+        422: detail ?? `Request failed (${res.status})`,
+        429: "Too many requests. Please wait a moment and try again.",
+        500: "The server encountered an error. Please try again.",
+        503: "The service is temporarily unavailable. Please try again in a moment.",
+      };
+      detail = detail ?? fallbackMessages[res.status] ?? `Request failed (${res.status})`;
       // A suspended account must be clearly told why and signed out so they are
       // not left half-logged-in.
       if (
@@ -499,13 +509,23 @@ export async function downloadReport(id: string, lang: string = "en") {
     clearTimeout(timer);
   }
   if (!res.ok) {
-    let detail = `Request failed (${res.status})`;
+    let detail: string | undefined;
     try {
       const body = await res.json();
       if (typeof body?.detail === "string") detail = body.detail;
     } catch {
-      // keep default message
+      // body not JSON
     }
+    const fallbackMessages: Record<number, string> = {
+      401: "Your session has expired. Please sign in again.",
+      403: "You don't have permission to perform this action.",
+      404: "The requested resource was not found.",
+      422: detail ?? `Request failed (${res.status})`,
+      429: "Too many requests. Please wait a moment and try again.",
+      500: "The server encountered an error. Please try again.",
+      503: "The service is temporarily unavailable. Please try again in a moment.",
+    };
+    detail = detail ?? fallbackMessages[res.status] ?? `Request failed (${res.status})`;
     throw new ApiError(res.status, detail);
   }
   const blob = await res.blob();
