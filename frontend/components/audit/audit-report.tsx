@@ -23,7 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { gradeFromScore } from "@/lib/utils";
+import { gradeFromScore, platformName } from "@/lib/utils";
 import { useI18n } from "@/components/i18n-provider";
 
 function ScoreBar({ score }: { score: number }) {
@@ -32,16 +32,6 @@ function ScoreBar({ score }: { score: number }) {
       <div className="h-full rounded-full bg-primary" style={{ width: `${score}%` }} />
     </div>
   );
-}
-
-function platformName(platform: string, t: (k: string) => string): string {
-  const key = platform.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (key === "unknown") return t("audit.platform.unknown");
-  if (key === "wordpress") return "WordPress";
-  if (key === "shopify") return "Shopify";
-  if (key === "squarespace") return "Squarespace";
-  if (key === "wix") return "Wix";
-  return platform;
 }
 
 function CheckStatusBadge({ status }: { status: string }) {

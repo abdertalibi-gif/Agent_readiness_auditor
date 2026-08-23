@@ -13,6 +13,7 @@ Behavior contract (matches the security requirements):
 import asyncio
 import logging
 import re
+from collections import deque
 from dataclasses import dataclass, field
 from urllib.parse import urlparse
 
@@ -131,7 +132,7 @@ async def crawl_website(
 
         # --- build frontier (priority: homepage, then sitemap URLs, then internal links) ---
         await stage("crawling")
-        frontier: list[tuple[str, int]] = []
+        frontier: deque[tuple[str, int]] = deque()
         seen: set[str] = set()
 
         def enqueue(u: str, depth: int) -> None:
@@ -179,7 +180,7 @@ async def crawl_website(
         while frontier and len(pages) < page_limit:
             batch: list[tuple[str, int]] = []
             while frontier and len(batch) < max(concurrency, page_limit - len(pages) + concurrency):
-                batch.append(frontier.pop(0))
+                batch.append(frontier.popleft())
             results = await asyncio.gather(*(fetch_one(u, d) for u, d in batch))
             for (u, d), page in zip(batch, results):
                 if page is None:

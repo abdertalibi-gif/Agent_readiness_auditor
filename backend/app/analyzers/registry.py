@@ -1,5 +1,6 @@
 """Analyzer registry: runs all deterministic analyzers over a CrawlContext."""
 
+import asyncio
 import logging
 from typing import Any
 
@@ -35,10 +36,16 @@ ANALYZERS: list[dict[str, Any]] = [
 
 async def run_analyzers(ctx: CrawlContext) -> list[CheckResult]:
     results: list[CheckResult] = []
-    for definition in ANALYZERS:
-        try:
-            checks = await definition["analyze"](ctx)
-            results.extend(checks)
-        except Exception:  # noqa: BLE001 - one analyzer must not sink the audit
-            logger.exception("analyzer %s failed", definition["name"])
+    try:
+        batch_results = await asyncio.gather(
+            *(definition["analyze"](ctx) for definition in ANALYZERS),
+            return_exceptions=True,
+        )
+        for result in batch_results:
+            if isinstance(result, Exception):
+                logger.exception("analyzer failed: %s", result)
+            elif isinstance(result, list):
+                results.extend(result)
+    except Exception:
+        logger.exception("run_analyzers failed")
     return results

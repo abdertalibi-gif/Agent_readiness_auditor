@@ -20,6 +20,7 @@ import {
   Network,
   Zap,
 } from "lucide-react";
+import { useMemo } from "react";
 
 import { HeroDashboard } from "@/components/landing/hero-dashboard";
 import { PublicReviewsSection } from "@/components/reviews/public-reviews-section";
@@ -31,7 +32,7 @@ import { useI18n } from "@/components/i18n-provider";
 export default function LandingPage() {
   const { t, categoryLabel } = useI18n();
 
-  const PROBLEM = [
+  const PROBLEM = useMemo(() => [
     {
       icon: Search,
       title: t("marketing.landing.problem.discoverTitle"),
@@ -47,17 +48,17 @@ export default function LandingPage() {
       title: t("marketing.landing.problem.actTitle"),
       text: t("marketing.landing.problem.actText"),
     },
-  ];
+  ], [t]);
 
-  const STEPS = [
+  const STEPS = useMemo(() => [
     t("marketing.landing.steps.enter"),
     t("marketing.landing.steps.crawl"),
     t("marketing.landing.steps.signals"),
     t("marketing.landing.steps.score"),
     t("marketing.landing.steps.recommendations"),
-  ];
+  ], [t]);
 
-  const CATEGORY_SCORES = [
+  const CATEGORY_SCORES = useMemo(() => [
     { label: categoryLabel("discoverability"), score: 88 },
     { label: categoryLabel("crawlability"), score: 92 },
     { label: categoryLabel("semantic_structure"), score: 76 },
@@ -66,9 +67,9 @@ export default function LandingPage() {
     { label: categoryLabel("navigation_linking"), score: 79 },
     { label: categoryLabel("technical_quality"), score: 94 },
     { label: categoryLabel("performance_accessibility"), score: 77 },
-  ];
+  ], [categoryLabel]);
 
-  const FEATURES = [
+  const FEATURES = useMemo(() => [
     { icon: Bot, title: t("marketing.landing.features.aiCrawlerTitle"), text: t("marketing.landing.features.aiCrawlerText") },
     { icon: Network, title: t("marketing.landing.features.sitemapTitle"), text: t("marketing.landing.features.sitemapText") },
     { icon: Braces, title: t("marketing.landing.features.schemaTitle"), text: t("marketing.landing.features.schemaText") },
@@ -81,18 +82,18 @@ export default function LandingPage() {
     { icon: Search, title: t("marketing.landing.features.urlStructureTitle"), text: t("marketing.landing.features.urlStructureText") },
     { icon: Fingerprint, title: t("marketing.landing.features.actionabilityTitle"), text: t("marketing.landing.features.actionabilityText") },
     { icon: Shield, title: t("marketing.landing.features.securityHeadersTitle"), text: t("marketing.landing.features.securityHeadersText") },
-  ];
+  ], [t]);
 
-  const SECURITY_ITEMS = [
+  const SECURITY_ITEMS = useMemo(() => [
     { icon: ShieldCheck, title: t("marketing.landing.security.ssrfTitle"), text: t("marketing.landing.security.ssrfText") },
     { icon: Lock, title: t("marketing.landing.security.httpsTitle"), text: t("marketing.landing.security.httpsText") },
     { icon: Server, title: t("marketing.landing.security.rateTitle"), text: t("marketing.landing.security.rateText") },
     { icon: Zap, title: t("marketing.landing.security.timeoutTitle"), text: t("marketing.landing.security.timeoutText") },
     { icon: Boxes, title: t("marketing.landing.security.privateNetTitle"), text: t("marketing.landing.security.privateNetText") },
     { icon: Link2, title: t("marketing.landing.security.redirectTitle"), text: t("marketing.landing.security.redirectText") },
-  ];
+  ], [t]);
 
-  const TRUST_NAMES = [
+  const TRUST_NAMES = useMemo(() => [
     t("marketing.landing.trust.name1"),
     t("marketing.landing.trust.name2"),
     t("marketing.landing.trust.name3"),
@@ -101,7 +102,7 @@ export default function LandingPage() {
     t("marketing.landing.trust.name6"),
     t("marketing.landing.trust.name7"),
     t("marketing.landing.trust.name8"),
-  ];
+  ], [t]);
 
   return (
     <div>

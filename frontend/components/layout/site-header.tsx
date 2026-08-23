@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 
@@ -20,7 +20,7 @@ export function SiteHeader() {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
 
-  const NAV = [
+  const NAV = useMemo(() => [
     { label: t("marketing.product"), children: [
       { label: t("marketing.features"), href: "/features" },
       { label: t("marketing.howItWorks"), href: "/how-it-works" },
@@ -28,7 +28,7 @@ export function SiteHeader() {
       { label: t("marketing.enterprise"), href: "/enterprise" },
     ]},
     { label: t("marketing.faqNav"), href: "/faq" },
-  ];
+  ], [t]);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">

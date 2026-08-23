@@ -89,6 +89,8 @@ async def start_audit(
 
 @router.get("", response_model=list[AuditOut])
 async def list_audits(
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0),
     user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_db_session),
 ) -> list[Audit]:
@@ -97,6 +99,8 @@ async def list_audits(
             select(Audit)
             .where(Audit.user_id == user.id)
             .order_by(Audit.created_at.desc(), Audit.id.asc())
+            .limit(limit)
+            .offset(offset)
         )
     ).all()
     return list(audits)
@@ -111,15 +115,19 @@ async def get_audit(
 
 @router.get("/{audit_id}/status", response_model=AuditStatusOut)
 async def get_audit_status(
+    response: Response,
     audit: Audit = Depends(get_audit_or_anonymous),
 ) -> Audit:
+    response.headers["Cache-Control"] = "private, max-age=3"
     return audit
 
 
 @router.get("/{audit_id}/summary", response_model=AuditSummaryOut)
 async def get_audit_summary(
+    response: Response,
     audit: Audit = Depends(get_audit_or_anonymous),
 ) -> dict:
+    response.headers["Cache-Control"] = "private, max-age=5"
     summary = audit.summary_json or {}
     categories = []
     for cat in summary.get("categories", []):
@@ -176,9 +184,10 @@ async def get_issues(
 @router.get("/{audit_id}/pages", response_model=list[PageOut])
 async def get_pages(
     audit: Audit = Depends(get_audit_or_anonymous),
+    limit: int = Query(default=100, ge=1, le=500),
     session: AsyncSession = Depends(get_db_session),
 ) -> list[Page]:
-    pages = (await session.scalars(select(Page).where(Page.audit_id == audit.id))).all()
+    pages = (await session.scalars(select(Page).where(Page.audit_id == audit.id).limit(limit))).all()
     return list(pages)
 
 
@@ -222,7 +231,11 @@ async def get_report(
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="agent-readiness-report-{audit.id[:8]}-{lang or "en"}.pdf"'},
+        headers={
+            "Content-Disposition": f'attachment; filename="agent-readiness-report-{audit.id[:8]}-{lang or "en"}.pdf"',
+            "Cache-Control": "private, max-age=3600",
+            "ETag": f'"{audit.id}-{lang}"',
+        },
     )
 
 

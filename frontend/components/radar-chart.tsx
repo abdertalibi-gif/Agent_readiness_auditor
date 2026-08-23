@@ -1,3 +1,4 @@
+import React from "react";
 import type { CategoryScore } from "@/lib/types";
 
 interface RadarChartProps {
@@ -16,7 +17,7 @@ const CENTER_LABELS: Record<string, string> = {
   performance_accessibility: "Perf",
 };
 
-export function RadarChart({ categories, size = 340 }: RadarChartProps) {
+export const RadarChart = React.memo(function RadarChart({ categories, size = 340 }: RadarChartProps) {
   const n = categories.length;
   const cx = size / 2;
   const cy = size / 2;
@@ -67,4 +68,4 @@ export function RadarChart({ categories, size = 340 }: RadarChartProps) {
       })}
     </svg>
   );
-}
+});

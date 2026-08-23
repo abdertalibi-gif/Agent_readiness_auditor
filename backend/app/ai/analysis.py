@@ -10,6 +10,7 @@ import logging
 from app.ai import prompts
 from app.ai.base import get_provider
 from app.analyzers.base import CheckResult
+from app.config import settings
 from app.scoring.categories import category_label
 from app.scoring.engine import ScoreResult
 

@@ -23,14 +23,14 @@ async def generate_report_pdf(session: AsyncSession, audit: Audit, language: str
 
     lang = norm_lang(language)
 
-    checks = (
-        (await session.scalars(select(AuditCheck).where(AuditCheck.audit_id == audit.id))).all()
-    )
-    pages = (await session.scalars(select(Page).where(Page.audit_id == audit.id))).all()
-    recommendations = (
-        (await session.scalars(select(Recommendation).where(Recommendation.audit_id == audit.id).order_by(
-            Recommendation.priority.asc()
-        ))).all()
+    checks, pages, recommendations = await asyncio.gather(
+        session.scalars(select(AuditCheck).where(AuditCheck.audit_id == audit.id)).all(),
+        session.scalars(select(Page).where(Page.audit_id == audit.id)).all(),
+        session.scalars(
+            select(Recommendation)
+            .where(Recommendation.audit_id == audit.id)
+            .order_by(Recommendation.priority.asc())
+        ).all(),
     )
 
     summary = audit.summary_json or {}

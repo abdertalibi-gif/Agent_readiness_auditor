@@ -65,3 +65,13 @@ export function gradeColor(grade: string): string {
       return "text-muted-foreground";
   }
 }
+
+export function platformName(platform: string, t: (k: string) => string): string {
+  const key = platform.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (key === "unknown") return t("audit.platform.unknown");
+  if (key === "wordpress") return "WordPress";
+  if (key === "shopify") return "Shopify";
+  if (key === "squarespace") return "Squarespace";
+  if (key === "wix") return "Wix";
+  return platform;
+}

@@ -113,16 +113,15 @@ export function DonutChart({ segments, className, size = 180 }: { segments: Segm
 
   // Each segment's dash offset accumulates the previous segments' dash
   // lengths. Computed immutably so nothing is reassigned during render.
-  const circles = segments.reduce<Array<Segment & { dash: number; offset: number }>>(
-    (acc, seg) => {
-      const frac = total > 0 ? seg.value / total : 0;
-      const dash = frac * c;
-      const last = acc[acc.length - 1];
-      const offset = last ? last.offset - last.dash : c;
-      return [...acc, { ...seg, dash, offset }];
-    },
-    []
-  );
+  const circles: Array<Segment & { dash: number; offset: number }> = [];
+  let prevOffset = c;
+  for (const seg of segments) {
+    const frac = total > 0 ? seg.value / total : 0;
+    const dash = frac * c;
+    const offset = prevOffset - dash;
+    circles.push({ ...seg, dash, offset });
+    prevOffset = offset;
+  }
 
   return (
     <div className={cn("relative inline-flex items-center justify-center", className)} style={{ width: size, height: size }}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { useI18n } from "@/components/i18n-provider";
@@ -7,7 +8,7 @@ import { useI18n } from "@/components/i18n-provider";
 export function SiteFooter() {
   const { t } = useI18n();
 
-  const COLUMNS = [
+  const COLUMNS = useMemo(() => [
     {
       title: t("marketing.product"),
       links: [
@@ -33,7 +34,7 @@ export function SiteFooter() {
         { label: t("marketing.dashboard"), href: "/dashboard" },
       ],
     },
-  ];
+  ], [t]);
 
   return (
     <footer className="border-t bg-muted/20">

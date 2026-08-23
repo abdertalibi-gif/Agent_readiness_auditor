@@ -10,15 +10,15 @@ function barColor(score: number) {
   return "bg-destructive";
 }
 
+const CATEGORIES = [
+  { key: "discoverability", score: 88 },
+  { key: "semantic_structure", score: 79 },
+  { key: "structured_data", score: 91 },
+  { key: "content_accessibility", score: 72 },
+];
+
 export function HeroDashboard() {
   const { t, categoryLabel, ratingLabel, confidenceLabel } = useI18n();
-
-  const CATEGORIES = [
-    { key: "discoverability", score: 88 },
-    { key: "semantic_structure", score: 79 },
-    { key: "structured_data", score: 91 },
-    { key: "content_accessibility", score: 72 },
-  ];
 
   return (
     <div className="relative mx-auto w-full max-w-md">

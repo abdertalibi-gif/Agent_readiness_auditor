@@ -38,7 +38,8 @@ export function clearHistory() {
 
 export async function loadRecentAudits(): Promise<AuditOut[]> {
   const ids = getRecentAuditIds();
-  const results = await Promise.allSettled(ids.map((id) => api.getAudit(id)));
+  const recentIds = ids.slice(0, 10);
+  const results = await Promise.allSettled(recentIds.map((id) => api.getAudit(id)));
   return results
     .filter((r): r is PromiseFulfilledResult<AuditOut> => r.status === "fulfilled")
     .map((r) => r.value);

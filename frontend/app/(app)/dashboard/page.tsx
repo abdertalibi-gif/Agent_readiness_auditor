@@ -61,19 +61,18 @@ export default function DashboardPage() {
   useEffect(() => {
     async function load() {
       let list: AuditOut[] = [];
-      let latest: AuditOut | null = null;
       try {
         list = await api.listAudits();
         setAudits(list);
-        latest =
+        const latestAudit =
           [...list]
             .filter((a) => a.status === "COMPLETED" || a.status === "PARTIAL")
             .sort((a, b) => (b.completed_at ?? "").localeCompare(a.completed_at ?? ""))[0] ?? null;
-        if (latest) {
+        if (latestAudit) {
           try {
             const [issueData, recData, myReviews] = await Promise.all([
-              api.getIssues(latest.id),
-              api.getRecommendations(latest.id),
+              api.getIssues(latestAudit.id),
+              api.getRecommendations(latestAudit.id),
               api.listMyReviews(5, 0),
             ]);
             setIssues(issueData.items);

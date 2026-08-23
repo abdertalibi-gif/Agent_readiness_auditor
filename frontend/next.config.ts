@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
   // EACCES errors on Windows. Set NEXT_OUTPUT=standalone in the Docker build.
   ...(isStandalone ? { output: "standalone" as const } : {}),
   reactStrictMode: true,
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },

@@ -44,7 +44,8 @@ export default function AdminDashboardPage() {
       .adminFeedbackStats()
       .then(setAppStats)
       .catch(() => setAppStats(null));
-  }, [t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (error) {
     return <div className="rounded-lg border border-destructive/40 p-6 text-destructive">{error}</div>;

@@ -22,6 +22,7 @@ import { ReviewPanel } from "@/components/reviews/review-panel";
 import { useAuditStatus } from "@/hooks/use-audit";
 import { useAuditSummary } from "@/hooks/use-summary";
 import { downloadReport } from "@/lib/api";
+import { platformName } from "@/lib/utils";
 import { useI18n } from "@/components/i18n-provider";
 import type { AuditStatus } from "@/lib/types";
 
@@ -184,14 +185,4 @@ export function AuditOverview({ auditId }: { auditId: string }) {
       <ReviewPanel auditId={auditId} status={status} />
     </div>
   );
-}
-
-function platformName(platform: string, t: (k: string) => string): string {
-  const key = platform.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (key === "unknown") return t("audit.platform.unknown");
-  if (key === "wordpress") return "WordPress";
-  if (key === "shopify") return "Shopify";
-  if (key === "squarespace") return "Squarespace";
-  if (key === "wix") return "Wix";
-  return platform;
 }

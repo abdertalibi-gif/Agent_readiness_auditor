@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -82,6 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const userName = user?.name || user?.email?.split("@")[0] || "there";
   const orgName = user?.company_name || "My Workspace";
   const freeMode = !isMonetizationEnabled();
+  const NAV = useMemo(() => getNavItems(t, user), [t, user]);
 
   if (loading) {
     return (
@@ -137,8 +138,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     if (href === "/settings/profile") return pathname.startsWith("/settings");
     return pathname === href || pathname.startsWith(href + "/");
   }
-
-  const NAV = getNavItems(t, user);
 
   const isSuperAdmin = user?.role === "SUPER_ADMIN";
 
