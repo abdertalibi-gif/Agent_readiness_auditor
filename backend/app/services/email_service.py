@@ -258,6 +258,14 @@ def send_password_reset_email(to_email: str, reset_url: str, language: str | Non
             logger.info("password reset email sent via smtp", extra={"to": to_email})
             return
         except (smtplib.SMTPException, OSError) as exc:
+            # In development, fall back to the local dev mailbox so the
+            # password-reset flow remains testable without a real SMTP server.
+            if settings.app_env != "production":
+                logger.warning(
+                    "SMTP send failed (%s), falling back to dev mailbox", exc, extra={"to": to_email}
+                )
+                _write_dev_mailbox(message, "password-reset")
+                return
             raise EmailDeliveryError(f"SMTP delivery failed: {exc}") from exc
     _deliver(message, "password-reset")
 
@@ -380,5 +388,11 @@ def send_invitation_email(
             logger.info("invitation email sent via smtp", extra={"to": to_email})
             return
         except (smtplib.SMTPException, OSError) as exc:
+            if settings.app_env != "production":
+                logger.warning(
+                    "SMTP send failed (%s), falling back to dev mailbox for invitation", exc, extra={"to": to_email}
+                )
+                _write_dev_mailbox(message, "invitation")
+                return
             raise EmailDeliveryError(f"SMTP delivery failed: {exc}") from exc
     _deliver(message, "invitation")
