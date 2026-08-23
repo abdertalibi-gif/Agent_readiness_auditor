@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Mail } from "lucide-react";
+import { ArrowLeft, Mail } from "lucide-react";
 
 import { api } from "@/lib/api";
 import { useI18n } from "@/components/i18n-provider";
@@ -33,12 +33,20 @@ export default function ForgotPasswordPage() {
       await api.forgotPassword(email);
       setSent(true);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("common.loading"));
+      toast.error(err instanceof Error ? err.message : t("common.serverError"));
       setLoading(false);
     }
   }
 
   return (
+    <>
+      <Link
+        href="/"
+        className="mb-4 inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        {t("common.backToHome")}
+      </Link>
     <Card>
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">{t("auth.forgotPasswordTitle")}</CardTitle>
@@ -75,5 +83,6 @@ export default function ForgotPasswordPage() {
         </p>
       </CardContent>
     </Card>
+    </>
   );
 }

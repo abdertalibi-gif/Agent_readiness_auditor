@@ -161,6 +161,7 @@ export interface Invitation {
   expires_at: string;
   accepted_at: string | null;
   rejected_at: string | null;
+  cancelled_at: string | null;
   email_sent: boolean;
 }
 

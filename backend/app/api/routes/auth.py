@@ -40,7 +40,7 @@ logger = logging.getLogger("auditor.api.auth")
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 _INVALID_RESET_TOKEN = HTTPException(
-    status_code=400, detail="Ce lien de réinitialisation est invalide ou a expiré."
+    status_code=400, detail="This reset link is invalid or has expired."
 )
 
 
@@ -194,7 +194,7 @@ async def forgot_password(
         except EmailDeliveryError as exc:
             logger.error("password reset email delivery FAILED: %s", exc, extra={"to": user.email})
 
-    return {"detail": "Si un compte existe pour cet email, un lien de réinitialisation a été envoyé."}
+    return {"detail": "If an account exists with this email, a reset link has been sent."}
 
 
 @router.post("/reset-password")
@@ -234,4 +234,4 @@ async def reset_password(
 
     await session.commit()
     logger.info("password reset completed", extra={"user_id": user.id})
-    return {"detail": "Votre mot de passe a été réinitialisé avec succès."}
+    return {"detail": "Your password has been reset successfully."}
