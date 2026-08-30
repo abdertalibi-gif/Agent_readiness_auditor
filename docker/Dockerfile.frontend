@@ -1,18 +1,20 @@
 FROM node:22-alpine AS deps
 WORKDIR /app
 COPY frontend/package.json frontend/pnpm-lock.yaml* frontend/pnpm-workspace.yaml ./
-RUN corepack enable && pnpm install --frozen-lockfile=false
+RUN corepack enable && corepack prepare pnpm@11.22.0 --activate && pnpm install --frozen-lockfile=false
 
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY frontend .
 ENV NEXT_TELEMETRY_DISABLED=1 NEXT_OUTPUT=standalone
-RUN corepack enable && pnpm build
+RUN corepack enable && corepack prepare pnpm@11.22.0 --activate && pnpm build
 
 FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME="0.0.0.0"
+# Next.js standalone respects $PORT (Render sets 10000, fallback 3000)
+ENV PORT=3000
 RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

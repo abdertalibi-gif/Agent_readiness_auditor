@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# System deps for lxml/pillow if needed
+# System deps for lxml (crawler) + psycopg (postgres)
 RUN apt-get update \
     && apt-get install -y --no-install-recommends gcc libxml2-dev libxslt1-dev libpq-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -24,4 +24,6 @@ RUN pip install --upgrade pip \
 
 EXPOSE 8000
 
+# Render sets $PORT (default 10000). Local fallback 8000.
+# Alembic runs on startup so external DB (Neon) is auto-migrated.
 CMD ["sh", "-c", "cd backend && alembic upgrade head && cd /app && exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
