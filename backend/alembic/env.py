@@ -12,10 +12,20 @@ from app.config import settings
 from app.database import Base
 import app.models  # noqa: F401  (register models)
 
+def _normalize_db_url(url: str) -> str:
+    if not url or url.startswith("sqlite") or "+psycopg" in url or "+asyncpg" in url:
+        return url
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return url
+
+
 config = context.config
 
 if not config.get_main_option("sqlalchemy.url"):
-    config.set_main_option("sqlalchemy.url", settings.database_url)
+    config.set_main_option("sqlalchemy.url", _normalize_db_url(settings.database_url))
 
 target_metadata = Base.metadata
 

@@ -11,19 +11,19 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends gcc libxml2-dev libxslt1-dev libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY backend/pyproject.toml backend/pyproject.toml
-COPY backend/README.md backend/README.md
-COPY backend/app backend/app
-COPY backend/alembic backend/alembic
-COPY backend/alembic.ini backend/alembic.ini
-COPY worker worker
-COPY database database
+# Repository root is the Docker build context (render.yaml: dockerContext: .)
+# so database/ and backend/ are available
+COPY backend/pyproject.toml backend/
+COPY backend/ backend/
+COPY database/ database/
+COPY worker/ worker/
 
 RUN pip install --upgrade pip \
     && pip install -e backend/
 
+WORKDIR /app/backend
+
 EXPOSE 8000
 
-# Render sets $PORT (default 10000). Local fallback 8000.
-# Alembic runs on startup so external DB (Neon) is auto-migrated.
-CMD ["sh", "-c", "cd backend && alembic upgrade head && cd /app && exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Render injects $PORT; alembic migrates external DB (Neon) on startup
+CMD ["sh", "-c", "alembic upgrade head && exec uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]

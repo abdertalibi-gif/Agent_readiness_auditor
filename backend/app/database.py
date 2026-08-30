@@ -22,6 +22,20 @@ def _engine_kwargs(url: str) -> dict:
     return kwargs
 
 
+def _normalize_database_url(url: str) -> str:
+    """Convert plain ``postgresql://``/``postgres://`` (Neon/Render default)
+    to ``postgresql+psycopg://`` required by SQLAlchemy async psycopg.
+    Already-qualified URLs (``+psycopg``, ``+asyncpg``, ``sqlite``) pass through.
+    """
+    if not url or url.startswith("sqlite") or "+psycopg" in url or "+asyncpg" in url:
+        return url
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return url
+
+
 def _resolve_sqlite_url(url: str) -> str:
     """Anchor CWD-relative SQLite paths to the backend project root and create
     the parent directory.
@@ -44,7 +58,7 @@ def _resolve_sqlite_url(url: str) -> str:
     return f"{scheme}:///{path.as_posix()}"
 
 
-_database_url = _resolve_sqlite_url(settings.database_url)
+_database_url = _resolve_sqlite_url(_normalize_database_url(settings.database_url))
 
 engine = create_async_engine(_database_url, **_engine_kwargs(_database_url))
 

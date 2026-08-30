@@ -17,6 +17,25 @@ def _url_host(url: str) -> str:
         return ""
 
 
+def _normalize_database_url(url: str) -> str:
+    """Normalize Render/Neon DATABASE_URL for SQLAlchemy async psycopg driver.
+
+    Neon and Render Postgres give you ``postgresql://`` or ``postgres://``.
+    SQLAlchemy async requires ``postgresql+psycopg://`` (psycopg v3).
+    This converts transparently so users can paste the URL as-is.
+    """
+    if not url:
+        return url
+    # Already has a driver (+psycopg, +psycopg2, +asyncpg, etc.) or is sqlite -> keep
+    if url.startswith("sqlite") or "+psycopg" in url or "+asyncpg" in url:
+        return url
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+psycopg://", 1)
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return url
+
+
 class Settings(BaseSettings):
     """Application settings loaded from environment / .env file."""
 
@@ -125,6 +144,8 @@ class Settings(BaseSettings):
         services, which is the only mode where ``postgres``/``redis`` are valid
         hosts. Native local development must use ``localhost``.
         """
+        # Normalize DATABASE_URL so Neon/Render `postgresql://` works out of the box
+        self.database_url = _normalize_database_url(self.database_url)
         if self.app_env in ("development", "testing"):
             for name, url in (
                 ("DATABASE_URL", self.database_url),
