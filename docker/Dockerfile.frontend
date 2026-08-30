@@ -16,8 +16,8 @@ ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 HOSTNAME="0.0.0.0"
 # Next.js standalone respects $PORT (Render sets 10000, fallback 3000)
 ENV PORT=3000
 RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+# Copy .next/standalone which contains the full app and server.js
+COPY --from=builder /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 EXPOSE 3000

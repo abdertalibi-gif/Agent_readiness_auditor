@@ -12,10 +12,9 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Repository root is the Docker build context (render.yaml: dockerContext: .)
-# so database/ and backend/ are available
+# Copy only required directories
 COPY backend/pyproject.toml backend/
 COPY backend/ backend/
-COPY database/ database/
 COPY worker/ worker/
 
 RUN pip install --upgrade pip \
