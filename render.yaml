@@ -1,24 +1,33 @@
-# Render Blueprint for Agent-Readiness Auditor.
+# Render Blueprint - Agent-Readiness Auditor
+# Deploy with: Render Dashboard > New > Blueprint > Connect this repo
+# Prerequisites:
+#   1. Create a free PostgreSQL on Neon (https://neon.tech) or Supabase.
+#      Neon free tier = 0.5 GB, no credit card. Copy the connection string.
+#      Example: postgresql://user:password@ep-xxx.neon.tech/neondb?sslmode=require
+#      Render will normalize it to postgresql+psycopg:// automatically.
+#   2. Push this file to branch `main` on GitHub.
+#   3. In Render, set DATABASE_URL and SECRET_KEY when prompted (see envVars below).
 #
-# Free stack (no credit card, no Redis, no Celery worker):
-#   - auditor-backend  : FastAPI (docker/Dockerfile.backend), JOB_MODE=inline so
-#                        audits run as in-process background tasks.
-#   - auditor-frontend : Next.js standalone (docker/Dockerfile.frontend) which
-#                        proxies /api/* to the backend, giving ONE public URL.
-#   - PostgreSQL       : external (e.g. Neon free) via DATABASE_URL secret.
+# Architecture (free tier, no Redis/Celery):
+#   auditor-backend  -> FastAPI (docker/Dockerfile.backend)  JOB_MODE=inline (background tasks in-process)
+#   auditor-frontend -> Next.js standalone (docker/Dockerfile.frontend) proxies /api/* -> backend
+#   Database         -> external Neon/Supabase (DATABASE_URL secret)
 #
-# Public URLs (predictable from the service names):
-#   https://auditor-frontend.onrender.com  (single entry point)
+# URLs after deploy:
+#   https://auditor-frontend.onrender.com  (public entry point - users use this)
 #   https://auditor-backend.onrender.com   (API + /docs)
+#
 services:
   - type: web
     name: auditor-backend
     runtime: docker
-    repo: https://github.com/abdertalibi-gif/Agent_readiness_auditor
+    repo: https://github.com/abdertalibi-gif/Agent_readiness_auditor.git
+    branch: main
     dockerfilePath: docker/Dockerfile.backend
     dockerContext: .
     plan: free
     healthCheckPath: /api/health
+    autoDeploy: true
     envVars:
       - key: APP_ENV
         value: production
@@ -27,7 +36,7 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL
-        sync: false
+        sync: false # Set in Render dashboard: postgresql://... from Neon (will be auto-normalized)
       - key: JOB_MODE
         value: inline
       - key: FRONTEND_URL
@@ -38,15 +47,24 @@ services:
         value: "false"
       - key: AI_PROVIDER
         value: none
+      # Optional: uncomment and set as sync:false if you use OpenAI
+      # - key: AI_API_KEY
+      #   sync: false
+      # - key: AI_MODEL
+      #   value: gpt-4o-mini
 
   - type: web
     name: auditor-frontend
     runtime: docker
-    repo: https://github.com/abdertalibi-gif/Agent_readiness_auditor
+    repo: https://github.com/abdertalibi-gif/Agent_readiness_auditor.git
+    branch: main
     dockerfilePath: docker/Dockerfile.frontend
     dockerContext: .
     plan: free
     healthCheckPath: /
+    autoDeploy: true
     envVars:
       - key: BACKEND_INTERNAL_URL
         value: https://auditor-backend.onrender.com
+      - key: NEXT_PUBLIC_MONETIZATION_ENABLED
+        value: "false"
