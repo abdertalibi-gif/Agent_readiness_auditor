@@ -1,5 +1,6 @@
 import asyncio
 import os
+import sys
 
 import sqlalchemy as sa
 from alembic import context
@@ -77,7 +78,15 @@ async def run_async_migrations() -> None:
 
 
 def run_migrations_online() -> None:
-    asyncio.run(run_async_migrations())
+    # psycopg's async mode cannot run on Windows' default ProactorEventLoop.
+    # Use a SelectorEventLoop for this asyncio.run() call only (no global
+    # policy monkeypatch), so `uvicorn --reload` and other asyncio consumers
+    # in the same process are unaffected. Linux/Render already default to a
+    # selector-based loop, so this is a no-op there.
+    if sys.platform == "win32":
+        asyncio.run(run_async_migrations(), loop_factory=asyncio.SelectorEventLoop)
+    else:
+        asyncio.run(run_async_migrations())
 
 
 if context.is_offline_mode():
