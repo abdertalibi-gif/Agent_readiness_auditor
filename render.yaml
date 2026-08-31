@@ -41,13 +41,18 @@ services:
         value: inline
 
       - key: FRONTEND_URL
-        value: https://agent-readiness-auditor.onrender.com
+        value: https://agentreadinessauditor.com
 
       - key: CORS_ORIGINS
-        value: https://agent-readiness-auditor.onrender.com
+        value: https://auditor-frontend-iqt1.onrender.com,https://agentreadinessauditor.com,https://www.agentreadinessauditor.com
 
       - key: ALLOW_PRIVATE_IP_RANGES
         value: "false"
+
+      - key: RATE_LIMIT_REQUESTS
+        value: "5"
+      - key: RATE_LIMIT_WINDOW_SECONDS
+        value: "900"
 
       - key: AI_PROVIDER
         value: none

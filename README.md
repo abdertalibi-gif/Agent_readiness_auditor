@@ -1,4 +1,4 @@
-# Agent-Readiness Auditor
+# Agent Readiness Auditor
 
 A production-ready SaaS web application that audits a website and determines how ready it is to be **discovered, understood, navigated and used by AI agents**.
 

@@ -23,7 +23,7 @@ interface FeedbackFormProps {
 
 /**
  * The feedback input form: interactive star rating, optional comment and a
- * primary submit CTA. Focuses on the Agent-Readiness Auditor application
+ * primary submit CTA. Focuses on the Agent Readiness Auditor application
  * itself (never the audited website).
  */
 export function FeedbackForm({

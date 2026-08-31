@@ -988,7 +988,7 @@
       "noReviews": "Aucun avis pour le moment.",
       "manageReviews": "Gérer les avis",
       "appFeedback": "Retours sur l’application",
-      "appFeedbackSubtitle": "Comment les utilisateurs notent Agent-Readiness Auditor.",
+      "appFeedbackSubtitle": "Comment les utilisateurs notent Agent Readiness Auditor.",
       "noFeedback": "Aucun retour sur l’application pour l’instant.",
       "manageFeedback": "Gérer les retours",
       "totalResponses": "Total des réponses",
@@ -1090,7 +1090,7 @@
     },
     "feedback": {
       "title": "Retours",
-      "subtitle": "Comment les utilisateurs notent l’application Agent-Readiness Auditor.",
+      "subtitle": "Comment les utilisateurs notent l’application Agent Readiness Auditor.",
       "loadFailed": "Échec du chargement des retours.",
       "loading": "Chargement des retours…",
       "none": "Aucun retour trouvé.",

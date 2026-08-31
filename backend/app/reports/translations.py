@@ -26,8 +26,8 @@ def norm_lang(language: str | None) -> str:
 
 PDF_TEXT: dict[str, dict[str, str]] = {
     "doc_title": {
-        "en": "Agent-Readiness Auditor",
-        "fr": "Agent-Readiness Auditor",
+        "en": "Agent Readiness Auditor",
+        "fr": "Agent Readiness Auditor",
         "ar": "مدقّق جاهزية الوكلاء الذكيين",
     },
     "report_subtitle": {

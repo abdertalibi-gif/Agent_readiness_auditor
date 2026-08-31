@@ -1,4 +1,4 @@
-"""Schemas for application feedback (rating of Agent-Readiness Auditor itself)."""
+"""Schemas for application feedback (rating of Agent Readiness Auditor itself)."""
 
 from datetime import datetime
 

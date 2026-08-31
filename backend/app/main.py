@@ -53,7 +53,7 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(
-    title="Agent-Readiness Auditor API",
+    title="Agent Readiness Auditor API",
     version="1.0.0",
     description=(
         "Audit websites for Agent Readiness: discoverability, crawlability, semantic structure, "
@@ -118,4 +118,4 @@ async def unhandled_handler(_request: Request, _exc: Exception):
 
 @app.get("/")
 async def root():
-    return {"service": "Agent-Readiness Auditor", "docs": "/docs"}
+    return {"service": "Agent Readiness Auditor", "docs": "/docs"}

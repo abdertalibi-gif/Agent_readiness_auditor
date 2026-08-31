@@ -15,12 +15,36 @@ function isLocale(value: string | undefined | null): value is Locale {
 }
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://agentreadinessauditor.com"),
   title: {
     default: "Agent Readiness Auditor — Is your website ready for AI agents?",
     template: "%s · Agent Readiness Auditor",
   },
   description:
     "AI Agent Discoverability & Technical Audit. Analyze your website's discoverability, structure, content and technical accessibility for AI-powered agents.",
+  applicationName: "Agent Readiness Auditor",
+  alternates: {
+    canonical: "https://agentreadinessauditor.com",
+  },
+  openGraph: {
+    title: "Agent Readiness Auditor — Is your website ready for AI agents?",
+    description:
+      "AI Agent Discoverability & Technical Audit. Analyze your website's discoverability, structure, content and technical accessibility for AI-powered agents.",
+    url: "https://agentreadinessauditor.com",
+    siteName: "Agent Readiness Auditor",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Agent Readiness Auditor",
+    description:
+      "AI Agent Discoverability & Technical Audit for AI agents.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 async function getServerLocale(): Promise<Locale | undefined> {

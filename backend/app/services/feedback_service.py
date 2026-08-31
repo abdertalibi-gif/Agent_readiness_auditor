@@ -1,7 +1,7 @@
 """Application feedback service.
 
 Authenticated users may leave exactly one rating (1..5) of the
-Agent-Readiness Auditor application itself, plus an optional comment. Submitting
+Agent Readiness Auditor application itself, plus an optional comment. Submitting
 again updates the existing record (never a duplicate). Comments are sanitized on
 write so stored text is safe to render as plain text anywhere.
 

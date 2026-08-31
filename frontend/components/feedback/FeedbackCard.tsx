@@ -32,7 +32,7 @@ function dismiss() {
 }
 
 /**
- * Dashboard card asking for feedback on the Agent-Readiness Auditor
+ * Dashboard card asking for feedback on the Agent Readiness Auditor
  * application itself (never the audited website). Loads the current user's
  * feedback, lets them submit/update/delete it, and hides behind a "Maybe
  * later" dismissal without nagging.

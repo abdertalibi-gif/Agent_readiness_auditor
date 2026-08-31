@@ -1,4 +1,4 @@
-# Agent-Readiness Auditor backend
+# Agent Readiness Auditor backend
 
 FastAPI backend: safe crawler, analyzers, scoring engine, AI analysis, PDF reports, background jobs.
 

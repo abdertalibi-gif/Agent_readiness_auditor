@@ -977,7 +977,7 @@
       "noReviews": "Aún no hay reseñas.",
       "manageReviews": "Gestionar reseñas",
       "appFeedback": "Comentarios de la aplicación",
-      "appFeedbackSubtitle": "Cómo valoran los usuarios la propia aplicación Agent-Readiness Auditor.",
+      "appFeedbackSubtitle": "Cómo valoran los usuarios la propia aplicación Agent Readiness Auditor.",
       "noFeedback": "Aún no hay comentarios sobre la aplicación.",
       "manageFeedback": "Gestionar comentarios",
       "totalResponses": "Total de respuestas",
@@ -1080,8 +1080,8 @@
   "feedback": {
     "weValue": "Valoramos tus comentarios",
     "yourFeedback": "Tus comentarios",
-    "cardSubtitle": "Ayúdanos a mejorar Agent-Readiness Auditor.",
-    "question": "¿Qué tan útil es Agent-Readiness Auditor para ti?",
+    "cardSubtitle": "Ayúdanos a mejorar Agent Readiness Auditor.",
+    "question": "¿Qué tan útil es Agent Readiness Auditor para ti?",
     "appNotWebsite": "Esto es sobre la aplicación en sí, no sobre ningún sitio auditado.",
     "ratingLabel": "Valora la aplicación",
     "stars": "{count} estrella(s)",
@@ -1139,7 +1139,7 @@
     },
     "feedback": {
       "title": "Comentarios",
-      "subtitle": "Cómo valoran los usuarios la propia aplicación Agent-Readiness Auditor.",
+      "subtitle": "Cómo valoran los usuarios la propia aplicación Agent Readiness Auditor.",
       "loadFailed": "Error al cargar los comentarios.",
       "loading": "Cargando comentarios…",
       "none": "No se encontraron comentarios.",

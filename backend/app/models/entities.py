@@ -351,7 +351,7 @@ class Review(Base):
 
 
 class UserFeedback(Base):
-    """A user's rating of the Agent-Readiness Auditor application itself.
+    """A user's rating of the Agent Readiness Auditor application itself.
 
     Distinct from ``Review`` (which rates a single completed audit). Exactly one
     active feedback record is allowed per user (enforced by the unique

@@ -17,7 +17,7 @@ export function Logo({
         <ScanSearch className="h-4 w-4" />
       </span>
       <span className="flex flex-col leading-none">
-        <span className="text-sm font-bold tracking-tight">AGENT-READINESS</span>
+        <span className="text-sm font-bold tracking-tight">AGENT READINESS</span>
         {!compact && <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">Auditor</span>}
       </span>
     </Link>

@@ -977,7 +977,7 @@
       "noReviews": "لا توجد تقييمات بعد.",
       "manageReviews": "إدارة التقييمات",
       "appFeedback": "ملاحظات التطبيق",
-      "appFeedbackSubtitle": "كيف يقيم المستخدمون تطبيق Agent-Readiness Auditor نفسه.",
+      "appFeedbackSubtitle": "كيف يقيم المستخدمون تطبيق Agent Readiness Auditor نفسه.",
       "noFeedback": "لا توجد ملاحظات على التطبيق بعد.",
       "manageFeedback": "إدارة الملاحظات",
       "totalResponses": "إجمالي الردود",
@@ -1079,7 +1079,7 @@
     },
     "feedback": {
       "title": "الملاحظات",
-      "subtitle": "كيف يقيم المستخدمون تطبيق Agent-Readiness Auditor نفسه.",
+      "subtitle": "كيف يقيم المستخدمون تطبيق Agent Readiness Auditor نفسه.",
       "loadFailed": "فشل تحميل الملاحظات.",
       "loading": "جارٍ تحميل الملاحظات…",
       "none": "لا توجد ملاحظات.",

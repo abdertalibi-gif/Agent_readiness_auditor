@@ -988,7 +988,7 @@
       "noReviews": "No reviews yet.",
       "manageReviews": "Manage reviews",
       "appFeedback": "Application feedback",
-      "appFeedbackSubtitle": "How users rate Agent-Readiness Auditor itself.",
+      "appFeedbackSubtitle": "How users rate Agent Readiness Auditor itself.",
       "noFeedback": "No application feedback yet.",
       "manageFeedback": "Manage feedback",
       "totalResponses": "Total responses",
@@ -1091,8 +1091,8 @@
   "feedback": {
     "weValue": "We value your feedback",
     "yourFeedback": "Your feedback",
-    "cardSubtitle": "Help us improve Agent-Readiness Auditor.",
-    "question": "How useful is Agent-Readiness Auditor for you?",
+    "cardSubtitle": "Help us improve Agent Readiness Auditor.",
+    "question": "How useful is Agent Readiness Auditor for you?",
     "appNotWebsite": "This is about the application itself, not any audited website.",
     "ratingLabel": "Rate the application",
     "stars": "{count} star(s)",
@@ -1150,7 +1150,7 @@
     },
     "feedback": {
       "title": "Feedback",
-      "subtitle": "How users rate the Agent-Readiness Auditor application itself.",
+      "subtitle": "How users rate the Agent Readiness Auditor application itself.",
       "loadFailed": "Failed to load feedback.",
       "loading": "Loading feedback…",
       "none": "No feedback found.",
