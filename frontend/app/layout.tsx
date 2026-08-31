@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 
 import { AuthProvider } from "@/components/auth-provider";
 import { I18nProvider } from "@/components/i18n-provider";
+import { SafePerformance } from "@/components/safe-performance";
 import type { Locale } from "@/lib/i18n";
 import "./globals.css";
 
@@ -34,6 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col">
+        <SafePerformance />
         <AuthProvider>
           <I18nProvider initialLocale={serverLocale}>{children}</I18nProvider>
         </AuthProvider>

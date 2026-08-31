@@ -219,8 +219,11 @@ async def get_report(
 
     try:
         pdf_bytes = await generate_report_pdf(session, audit, language=lang or "en")
-    except Exception:  # noqa: BLE001
-        logger.exception("report generation failed for audit_id=%s", audit.id)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception(
+            "report generation failed for audit_id=%s lang=%s: %s: %s",
+            audit.id, lang or "en", type(exc).__name__, exc,
+        )
         raise HTTPException(
             status_code=500, detail="Report generation failed. Please try again."
         ) from None

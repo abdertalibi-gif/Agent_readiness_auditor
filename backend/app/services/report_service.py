@@ -23,20 +23,26 @@ async def generate_report_pdf(session: AsyncSession, audit: Audit, language: str
 
     lang = norm_lang(language)
 
-    checks, pages, recommendations = await asyncio.gather(
-        session.scalars(select(AuditCheck).where(AuditCheck.audit_id == audit.id)).all(),
-        session.scalars(select(Page).where(Page.audit_id == audit.id)).all(),
-        session.scalars(
-            select(Recommendation)
-            .where(Recommendation.audit_id == audit.id)
-            .order_by(Recommendation.priority.asc())
-        ).all(),
-    )
+    # AsyncSession.scalars() is a coroutine — it must be awaited before
+    # calling .all().  SQLAlchemy's AsyncSession also does not support
+    # concurrent queries on the same connection, so sequential awaits are
+    # the correct pattern here.
+    checks = (await session.scalars(
+        select(AuditCheck).where(AuditCheck.audit_id == audit.id)
+    )).all()
+    pages = (await session.scalars(
+        select(Page).where(Page.audit_id == audit.id)
+    )).all()
+    recommendations = (await session.scalars(
+        select(Recommendation)
+        .where(Recommendation.audit_id == audit.id)
+        .order_by(Recommendation.priority.asc())
+    )).all()
 
     summary = audit.summary_json or {}
-    categories = summary.get("categories", [])
-    counts = summary.get("counts", {})
-    coverage = summary.get("coverage", {})
+    categories = summary.get("categories") or []
+    counts = summary.get("counts") or {}
+    coverage = summary.get("coverage") or {}
 
     severity_order = {"CRITICAL": 0, "HIGH": 1, "MEDIUM": 2, "LOW": 3, "INFO": 4}
     failed = sorted(

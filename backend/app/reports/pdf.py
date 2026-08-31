@@ -98,9 +98,11 @@ def _register_fonts() -> None:
     _FONT_REGISTERED = True
 
 
-def _process(text_value: str, lang: str) -> str:
+def _process(text_value: str | None, lang: str) -> str:
     """Shape and reorder text for RTL rendering (Arabic) while preserving the
     ReportLab markup tags and HTML entities intact."""
+    if text_value is None:
+        return ""
     if lang != "ar" or not text_value:
         return text_value
     parts = _TAG_RE.split(text_value)
@@ -111,7 +113,11 @@ def _process(text_value: str, lang: str) -> str:
         if _TAG_RE.fullmatch(part):
             out.append(part)
         else:
-            out.append(get_display(_reshaper.reshape(part)))
+            try:
+                out.append(get_display(_reshaper.reshape(part)))
+            except Exception:
+                # If reshaping fails for a specific fragment, keep the original.
+                out.append(part)
     return "".join(out)
 
 
@@ -199,16 +205,16 @@ def build_pdf(data: dict, language: str = "en") -> bytes:
         summary = text(
             "exec_summary_fallback",
             lang,
-            score=f"{data.get('score', 0):.0f}",
-            rating_label=rating_label(data.get("rating", ""), lang),
-            fail_count=data.get("counts", {}).get("FAIL", 0),
+            score=f"{(data.get('score') or 0):.0f}",
+            rating_label=rating_label(data.get("rating") or "", lang),
+            fail_count=(data.get("counts") or {}).get("FAIL", 0),
         )
     story.append(Paragraph(_process(summary, lang), styles["body"]))
 
     # 2. Overall score
     story.append(Paragraph(_process(text("section_score", lang), lang), styles["h1"]))
-    story.append(Paragraph(f"{data.get('score', 0):.0f} / 100", styles["score"]))
-    rating = data.get("rating", "")
+    story.append(Paragraph(f"{(data.get('score') or 0):.0f} / 100", styles["score"]))
+    rating = data.get("rating") or ""
     rating_line = text(
         "rating_label",
         lang,
@@ -228,7 +234,7 @@ def build_pdf(data: dict, language: str = "en") -> bytes:
 
     # 3. Category scores (table + bars)
     story.append(Paragraph(_process(text("section_categories", lang), lang), styles["h1"]))
-    categories = data.get("categories", [])
+    categories = data.get("categories") or []
     rows = [
         [
             text("cat_table_header", lang),
@@ -240,7 +246,7 @@ def build_pdf(data: dict, language: str = "en") -> bytes:
         rows.append(
             [
                 _process(category_label(cat.get("category", ""), lang), lang),
-                _process(f"{cat.get('score', 0):.0f}/100", lang),
+                _process(f"{(cat.get('score') or 0):.0f}/100", lang),
                 _process(category_status_label(cat.get("status", ""), lang), lang),
             ]
         )
@@ -265,7 +271,7 @@ def build_pdf(data: dict, language: str = "en") -> bytes:
 
     # 4. Critical issues
     story.append(Paragraph(_process(text("section_issues", lang), lang), styles["h1"]))
-    issues = data.get("issues", [])
+    issues = data.get("issues") or []
     if issues:
         for issue in issues[:10]:
             color = _SEVERITY_COLOR.get(issue.get("severity", "INFO"), GREY)
@@ -310,7 +316,7 @@ def build_pdf(data: dict, language: str = "en") -> bytes:
 
     # 5. Detailed findings
     story.append(Paragraph(_process(text("section_findings", lang), lang), styles["h1"]))
-    findings = data.get("findings", [])
+    findings = data.get("findings") or []
     if findings:
         rows = [
             [
@@ -328,7 +334,7 @@ def build_pdf(data: dict, language: str = "en") -> bytes:
                     _process(category_label(f.get("category", ""), lang), lang),
                     _process(check_status_label(f.get("status", ""), lang), lang),
                     _process(severity_label(f.get("severity", ""), lang), lang),
-                    _process(f"{f.get('score', 0):.0f}", lang),
+                    _process(f"{(f.get('score') or 0):.0f}", lang),
                 ]
             )
         t2 = Table(rows, colWidths=[60 * mm, 30 * mm, 22 * mm, 22 * mm, 18 * mm])
@@ -352,7 +358,7 @@ def build_pdf(data: dict, language: str = "en") -> bytes:
 
     # 6. Recommendations
     story.append(Paragraph(_process(text("section_recommendations", lang), lang), styles["h1"]))
-    recs = data.get("recommendations", [])
+    recs = data.get("recommendations") or []
     if recs:
         for i, rec in enumerate(recs, start=1):
             title = check_translations.localize(rec.get("title", ""), lang)
@@ -394,11 +400,11 @@ def build_pdf(data: dict, language: str = "en") -> bytes:
     pages_analyzed = text(
         "pages_analyzed",
         lang,
-        pages=data.get("coverage", {}).get("pages", 0),
-        checks=data.get("counts", {}),
+        pages=(data.get("coverage") or {}).get("pages", 0),
+        checks=data.get("counts") or {},
     )
     story.append(Paragraph(_process(pages_analyzed, lang), styles["body"]))
-    pages = data.get("pages", [])
+    pages = data.get("pages") or []
     if pages:
         rows = [
             [
