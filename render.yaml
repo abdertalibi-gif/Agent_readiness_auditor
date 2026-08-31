@@ -1,5 +1,3 @@
-# Render Blueprint - Agent-Readiness Auditor
-
 services:
   - type: web
     name: auditor-backend-iqt1
