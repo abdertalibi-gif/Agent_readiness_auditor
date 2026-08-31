@@ -39,10 +39,11 @@ services:
         sync: false # Set in Render dashboard: postgresql://... from Neon (will be auto-normalized)
       - key: JOB_MODE
         value: inline
-      - key: FRONTEND_URL
-        value: https://auditor-frontend-iqt1.onrender.com
+       - key: FRONTEND_URL
+        value: https://agent-readiness-auditor.onrender.com
+
       - key: CORS_ORIGINS
-        value: https://auditor-frontend-iqt1.onrender.com
+        value: https://agent-readiness-auditor.onrender.com
       - key: ALLOW_PRIVATE_IP_RANGES
         value: "false"
       - key: AI_PROVIDER
