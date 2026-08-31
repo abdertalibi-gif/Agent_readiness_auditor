@@ -1,12 +1,26 @@
+# Render Blueprint - Agent Readiness Auditor
+# Architecture:
+#   Backend  -> FastAPI
+#   Frontend -> Next.js
+#   Database -> External Neon/Supabase PostgreSQL
+
 services:
+
+  # =========================
+  # BACKEND
+  # =========================
   - type: web
     name: auditor-backend-iqt1
     runtime: docker
+
     repo: https://github.com/abdertalibi-gif/Agent_readiness_auditor.git
     branch: main
+
     dockerfilePath: docker/Dockerfile.backend
     dockerContext: .
+
     plan: free
+
     healthCheckPath: /api/health
     autoDeploy: true
 
@@ -38,14 +52,31 @@ services:
       - key: AI_PROVIDER
         value: none
 
+      # Optional OpenAI configuration
+      # Uncomment only if you use OpenAI
+      #
+      # - key: AI_API_KEY
+      #   sync: false
+      #
+      # - key: AI_MODEL
+      #   value: gpt-4o-mini
+
+
+  # =========================
+  # FRONTEND
+  # =========================
   - type: web
     name: agent-readiness-auditor
     runtime: docker
+
     repo: https://github.com/abdertalibi-gif/Agent_readiness_auditor.git
     branch: main
+
     dockerfilePath: docker/Dockerfile.frontend
     dockerContext: .
+
     plan: free
+
     healthCheckPath: /
     autoDeploy: true
 
