@@ -17,6 +17,8 @@
 #   https://auditor-frontend-iqt1.onrender.com  (public entry point - users use this)
 #   https://auditor-backend-iqt1.onrender.com   (API + /docs)
 #
+# Render Blueprint - Agent-Readiness Auditor
+
 services:
   - type: web
     name: auditor-backend-iqt1
@@ -28,34 +30,37 @@ services:
     plan: free
     healthCheckPath: /api/health
     autoDeploy: true
+
     envVars:
       - key: APP_ENV
         value: production
+
       - key: DEBUG
         value: "false"
+
       - key: SECRET_KEY
         generateValue: true
+
       - key: DATABASE_URL
-        sync: false # Set in Render dashboard: postgresql://... from Neon (will be auto-normalized)
+        sync: false
+
       - key: JOB_MODE
         value: inline
-       - key: FRONTEND_URL
+
+      - key: FRONTEND_URL
         value: https://agent-readiness-auditor.onrender.com
 
       - key: CORS_ORIGINS
         value: https://agent-readiness-auditor.onrender.com
+
       - key: ALLOW_PRIVATE_IP_RANGES
         value: "false"
+
       - key: AI_PROVIDER
         value: none
-      # Optional: uncomment and set as sync:false if you use OpenAI
-      # - key: AI_API_KEY
-      #   sync: false
-      # - key: AI_MODEL
-      #   value: gpt-4o-mini
 
   - type: web
-    name: auditor-frontend-iqt1
+    name: agent-readiness-auditor
     runtime: docker
     repo: https://github.com/abdertalibi-gif/Agent_readiness_auditor.git
     branch: main
@@ -64,8 +69,10 @@ services:
     plan: free
     healthCheckPath: /
     autoDeploy: true
+
     envVars:
       - key: BACKEND_INTERNAL_URL
         value: https://auditor-backend-iqt1.onrender.com
+
       - key: NEXT_PUBLIC_MONETIZATION_ENABLED
         value: "false"
