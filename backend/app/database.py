@@ -23,16 +23,31 @@ def _engine_kwargs(url: str) -> dict:
 
 
 def _normalize_database_url(url: str) -> str:
-    """Convert plain ``postgresql://``/``postgres://`` (Neon/Render default)
-    to ``postgresql+psycopg://`` required by SQLAlchemy async psycopg.
-    Already-qualified URLs (``+psycopg``, ``+asyncpg``, ``sqlite``) pass through.
+    """Convert plain ``postgresql://``/``postgres://`` to ``postgresql+psycopg://``
+    and strip unsupported ``schema`` query param (Prisma-style).
     """
-    if not url or url.startswith("sqlite") or "+psycopg" in url or "+asyncpg" in url:
+    if not url:
         return url
-    if url.startswith("postgres://"):
-        return url.replace("postgres://", "postgresql+psycopg://", 1)
-    if url.startswith("postgresql://"):
-        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    if url.startswith("sqlite"):
+        return url
+    from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
+    # Normalize driver if missing
+    if "+psycopg" not in url and "+asyncpg" not in url:
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+psycopg://", 1)
+        elif url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+    # Strip schema param that psycopg rejects
+    try:
+        parsed = urlparse(url)
+        if parsed.query:
+            qsl = parse_qsl(parsed.query, keep_blank_values=True)
+            filtered = [(k, v) for k, v in qsl if k.lower() != "schema"]
+            if len(filtered) != len(qsl):
+                url = urlunparse(parsed._replace(query=urlencode(filtered, doseq=True)))
+    except Exception:
+        pass
     return url
 
 

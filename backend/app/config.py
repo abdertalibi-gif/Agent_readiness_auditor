@@ -23,16 +23,36 @@ def _normalize_database_url(url: str) -> str:
     Neon and Render Postgres give you ``postgresql://`` or ``postgres://``.
     SQLAlchemy async requires ``postgresql+psycopg://`` (psycopg v3).
     This converts transparently so users can paste the URL as-is.
+    Also strips unsupported ``schema`` query param (Prisma-style) that psycopg
+    rejects as ``invalid connection option "schema"``.
     """
     if not url:
         return url
     # Already has a driver (+psycopg, +psycopg2, +asyncpg, etc.) or is sqlite -> keep
-    if url.startswith("sqlite") or "+psycopg" in url or "+asyncpg" in url:
+    # But still strip schema param if present
+    from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
+    # Normalize driver prefix
+    if url.startswith("sqlite"):
         return url
-    if url.startswith("postgres://"):
-        return url.replace("postgres://", "postgresql+psycopg://", 1)
-    if url.startswith("postgresql://"):
-        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    original = url
+    if "+psycopg" not in url and "+asyncpg" not in url:
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+psycopg://", 1)
+        elif url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+    # Strip unsupported query params like `schema` (Prisma)
+    try:
+        parsed = urlparse(url)
+        if parsed.query:
+            qsl = parse_qsl(parsed.query, keep_blank_values=True)
+            filtered = [(k, v) for k, v in qsl if k.lower() != "schema"]
+            if len(filtered) != len(qsl):
+                new_query = urlencode(filtered, doseq=True)
+                url = urlunparse(parsed._replace(query=new_query))
+    except Exception:
+        # If parsing fails, return url as-is (or original with driver fix)
+        pass
     return url
 
 

@@ -14,12 +14,28 @@ from app.database import Base
 import app.models  # noqa: F401  (register models)
 
 def _normalize_db_url(url: str) -> str:
-    if not url or url.startswith("sqlite") or "+psycopg" in url or "+asyncpg" in url:
+    if not url:
         return url
-    if url.startswith("postgres://"):
-        return url.replace("postgres://", "postgresql+psycopg://", 1)
-    if url.startswith("postgresql://"):
-        return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    if url.startswith("sqlite"):
+        return url
+    from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
+    # Normalize driver
+    if "+psycopg" not in url and "+asyncpg" not in url:
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+psycopg://", 1)
+        elif url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+psycopg://", 1)
+    # Strip schema query param (Prisma) that psycopg rejects
+    try:
+        parsed = urlparse(url)
+        if parsed.query:
+            qsl = parse_qsl(parsed.query, keep_blank_values=True)
+            filtered = [(k, v) for k, v in qsl if k.lower() != "schema"]
+            if len(filtered) != len(qsl):
+                url = urlunparse(parsed._replace(query=urlencode(filtered, doseq=True)))
+    except Exception:
+        pass
     return url
 
 
