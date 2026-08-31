@@ -29,8 +29,12 @@ const nextConfig: NextConfig = {
         ...(isStandalone
           ? {
               async rewrites() {
-                const target = process.env.BACKEND_INTERNAL_URL;
-                if (!target) return [];
+                // BACKEND_INTERNAL_URL is injected via Render envVars at runtime, but Next.js
+                // rewrites are inlined at *build* time. Ensure a fallback so the build
+                // always generates the proxy, and the Dockerfile builder sets the correct
+                // Render URL via ARG/ENV. Local dev (pnpm dev) doesn't use rewrites.
+                const target =
+                  process.env.BACKEND_INTERNAL_URL || "https://auditor-backend-iqt1.onrender.com";
                 return [
                   {
                     source: "/api/:path*",

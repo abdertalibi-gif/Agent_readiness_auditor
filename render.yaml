@@ -14,12 +14,12 @@
 #   Database         -> external Neon/Supabase (DATABASE_URL secret)
 #
 # URLs after deploy:
-#   https://auditor-frontend.onrender.com  (public entry point - users use this)
-#   https://auditor-backend.onrender.com   (API + /docs)
+#   https://auditor-frontend-iqt1.onrender.com  (public entry point - users use this)
+#   https://auditor-backend-iqt1.onrender.com   (API + /docs)
 #
 services:
   - type: web
-    name: auditor-backend
+    name: auditor-backend-iqt1
     runtime: docker
     repo: https://github.com/abdertalibi-gif/Agent_readiness_auditor.git
     branch: main
@@ -40,9 +40,9 @@ services:
       - key: JOB_MODE
         value: inline
       - key: FRONTEND_URL
-        value: https://auditor-frontend.onrender.com
+        value: https://auditor-frontend-iqt1.onrender.com
       - key: CORS_ORIGINS
-        value: https://auditor-frontend.onrender.com
+        value: https://auditor-frontend-iqt1.onrender.com
       - key: ALLOW_PRIVATE_IP_RANGES
         value: "false"
       - key: AI_PROVIDER
@@ -54,7 +54,7 @@ services:
       #   value: gpt-4o-mini
 
   - type: web
-    name: auditor-frontend
+    name: auditor-frontend-iqt1
     runtime: docker
     repo: https://github.com/abdertalibi-gif/Agent_readiness_auditor.git
     branch: main
@@ -65,6 +65,6 @@ services:
     autoDeploy: true
     envVars:
       - key: BACKEND_INTERNAL_URL
-        value: https://auditor-backend.onrender.com
+        value: https://auditor-backend-iqt1.onrender.com
       - key: NEXT_PUBLIC_MONETIZATION_ENABLED
         value: "false"

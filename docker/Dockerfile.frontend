@@ -7,7 +7,10 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY frontend .
-ENV NEXT_TELEMETRY_DISABLED=1 NEXT_OUTPUT=standalone
+# BACKEND_INTERNAL_URL must be available at *build* time for Next.js rewrites to be
+# inlined. Render provides it at runtime, so we bake the production URL as fallback.
+ARG BACKEND_INTERNAL_URL=https://auditor-backend-iqt1.onrender.com
+ENV NEXT_TELEMETRY_DISABLED=1 NEXT_OUTPUT=standalone BACKEND_INTERNAL_URL=$BACKEND_INTERNAL_URL
 RUN corepack enable && corepack prepare pnpm@11.22.0 --activate && pnpm build
 
 FROM node:22-alpine AS runner

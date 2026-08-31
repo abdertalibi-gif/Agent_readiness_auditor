@@ -1,3 +1,5 @@
+import asyncio
+import sys
 from collections.abc import AsyncGenerator
 from pathlib import Path
 from urllib.parse import unquote, urlparse
@@ -6,6 +8,15 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from sqlalchemy.orm import DeclarativeBase
 
 from app.config import settings
+
+# Psycopg async requires SelectorEventLoop on Windows (Proactor not supported).
+# Set the policy once at import time so every async engine benefits, while
+# Linux/Render keeps the default policy.
+if sys.platform == "win32":
+    try:
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    except Exception:
+        pass
 
 
 class Base(DeclarativeBase):
