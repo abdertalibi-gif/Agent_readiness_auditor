@@ -24,13 +24,30 @@ _SUSPENDED = HTTPException(
 )
 
 
-async def rate_limited(request: Request) -> None:
-    """Per-IP rate limiting for audit creation and crawl-heavy endpoints."""
+def _extract_client_ip(request: Request) -> str:
+    """Extract the real client IP behind proxies.
+
+    Priority:
+    1. ``X-Real-IP`` – set by our Next.js middleware from Render's
+       ``X-Forwarded-For`` before the rewrite proxy sends the request.
+    2. ``X-Forwarded-For`` – first entry (original client) when the header
+       is forwarded directly (e.g. direct backend access).
+    3. ``request.client.host`` – direct connection.
+    """
+    real_ip = request.headers.get("x-real-ip")
+    if real_ip:
+        return real_ip.strip()
+
     forwarded = request.headers.get("x-forwarded-for")
     if forwarded:
-        client_ip = forwarded.split(",")[0].strip()
-    else:
-        client_ip = request.client.host if request.client else "unknown"
+        return forwarded.split(",")[0].strip()
+
+    return request.client.host if request.client else "unknown"
+
+
+async def rate_limited(request: Request) -> None:
+    """Per-IP rate limiting for audit creation and crawl-heavy endpoints."""
+    client_ip = _extract_client_ip(request)
     try:
         await check_rate_limit(f"api:{client_ip}")
     except RateLimitExceeded as exc:

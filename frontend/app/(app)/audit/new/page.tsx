@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, Zap } from "lucide-react";
+import { ShieldCheck, Zap, Clock } from "lucide-react";
 import { toast } from "sonner";
 
 import { useI18n } from "@/components/i18n-provider";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
 import { isFreeMode } from "@/lib/config";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,6 +62,8 @@ export default function NewAuditPage() {
   const [url, setUrl] = useState("");
   const [scope, setScope] = useState(freeMode ? "quick" : "standard");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [retryAfter, setRetryAfter] = useState<number | null>(null);
 
   const selected = scopes.find((s) => s.id === scope) ?? scopes[0];
 
@@ -71,13 +74,18 @@ export default function NewAuditPage() {
       toast.error(t("auditNew.enterUrl"));
       return;
     }
+    setErrorMessage(null);
+    setRetryAfter(null);
     setLoading(true);
     try {
       const audit = await api.createAudit(trimmed, selected.pages);
       toast.success(t("audit.startedToast"), { description: t("audit.crawlingToast", { pages: selected.pages }) });
       router.push(`/audits/${audit.id}/progress`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("auditNew.startFailed"));
+      const msg = err instanceof Error ? err.message : t("auditNew.startFailed");
+      const retry = err instanceof ApiError ? err.retryAfter : undefined;
+      setErrorMessage(msg);
+      setRetryAfter(retry ?? null);
       setLoading(false);
     }
   }
@@ -156,6 +164,20 @@ export default function NewAuditPage() {
             {t("audit.note")}
           </p>
         </div>
+
+        {errorMessage && (
+          <Alert variant="destructive">
+            <Clock className="h-4 w-4" />
+            <AlertDescription>
+              {errorMessage}
+              {retryAfter != null && retryAfter > 0 && (
+                <span className="mt-1 block text-xs opacity-80">
+                  {t("auditNew.retryAfter", { seconds: retryAfter })}
+                </span>
+              )}
+            </AlertDescription>
+          </Alert>
+        )}
       </form>
     </div>
   );

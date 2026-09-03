@@ -85,10 +85,14 @@ async def security_error_handler(_request: Request, exc: SecurityError):
 
 @app.exception_handler(RateLimitExceeded)
 async def rate_limit_handler(_request: Request, exc: RateLimitExceeded):
+    retry_after = int(exc.retry_after)
     return JSONResponse(
         status_code=429,
-        content={"detail": "Too many requests. Please wait and try again."},
-        headers={"Retry-After": str(int(exc.retry_after))},
+        content={
+            "detail": f"Too many requests. Please try again in {retry_after} seconds.",
+            "retry_after": retry_after,
+        },
+        headers={"Retry-After": str(retry_after)},
     )
 
 

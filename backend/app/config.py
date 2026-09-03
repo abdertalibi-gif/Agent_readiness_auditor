@@ -94,9 +94,9 @@ class Settings(BaseSettings):
     ai_model: str = "gpt-4o-mini"
     ai_timeout_seconds: float = 45.0
 
-    # Rate limiting
-    rate_limit_requests: int = 60
-    rate_limit_window_seconds: int = 60
+    # Rate limiting (per-IP sliding window for POST /api/audits)
+    rate_limit_requests: int = 5
+    rate_limit_window_seconds: int = 900  # 15 minutes
 
     # Authentication
     auth_token_ttl_days: int = 7

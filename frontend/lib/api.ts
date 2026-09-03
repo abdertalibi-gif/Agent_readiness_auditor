@@ -50,9 +50,11 @@ function isConnectionError(err: unknown): boolean {
 
 export class ApiError extends Error {
   status: number;
-  constructor(status: number, message: string) {
+  retryAfter?: number;
+  constructor(status: number, message: string, retryAfter?: number) {
     super(message);
     this.status = status;
+    this.retryAfter = retryAfter;
   }
 }
 
@@ -120,18 +122,24 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
         }
       }
       let detail: string | undefined;
+      let retryAfter: number | undefined;
       try {
         const body = await res.json();
         if (typeof body?.detail === "string") detail = body.detail;
+        if (typeof body?.retry_after === "number") retryAfter = body.retry_after;
       } catch {
         // body not JSON
+        const ra = res.headers.get("retry-after");
+        if (ra) retryAfter = parseInt(ra, 10) || undefined;
       }
       const fallbackMessages: Record<number, string> = {
         401: "Your session has expired. Please sign in again.",
         403: "You don't have permission to perform this action.",
         404: "The requested resource was not found.",
         422: detail ?? `Request failed (${res.status})`,
-        429: "Too many requests. Please wait a moment and try again.",
+        429: retryAfter
+          ? `Too many requests. Please try again in ${retryAfter} seconds.`
+          : "Too many requests. Please try again in a moment.",
         500: "The server encountered an error. Please try again.",
         503: "The service is temporarily unavailable. Please try again in a moment.",
       };
@@ -152,7 +160,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
           window.location.assign("/login?suspended=1");
         }
       }
-      throw new ApiError(res.status, detail);
+      throw new ApiError(res.status, detail, retryAfter);
     }
 
     if (res.status === 204) return undefined as T;
@@ -510,23 +518,28 @@ export async function downloadReport(id: string, lang: string = "en") {
   }
   if (!res.ok) {
     let detail: string | undefined;
+    let retryAfter: number | undefined;
     try {
       const body = await res.json();
       if (typeof body?.detail === "string") detail = body.detail;
+      if (typeof body?.retry_after === "number") retryAfter = body.retry_after;
     } catch {
-      // body not JSON
+      const ra = res.headers.get("retry-after");
+      if (ra) retryAfter = parseInt(ra, 10) || undefined;
     }
     const fallbackMessages: Record<number, string> = {
       401: "Your session has expired. Please sign in again.",
       403: "You don't have permission to perform this action.",
       404: "The requested resource was not found.",
       422: detail ?? `Request failed (${res.status})`,
-      429: "Too many requests. Please wait a moment and try again.",
+      429: retryAfter
+        ? `Too many requests. Please try again in ${retryAfter} seconds.`
+        : "Too many requests. Please try again in a moment.",
       500: "The server encountered an error. Please try again.",
       503: "The service is temporarily unavailable. Please try again in a moment.",
     };
     detail = detail ?? fallbackMessages[res.status] ?? `Request failed (${res.status})`;
-    throw new ApiError(res.status, detail);
+    throw new ApiError(res.status, detail, retryAfter);
   }
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);

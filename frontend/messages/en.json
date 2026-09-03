@@ -1368,6 +1368,7 @@
     "deepTagline": "Detailed analysis",
     "enterUrl": "Please enter a website URL",
     "startFailed": "Could not start the audit. Please try again.",
+    "retryAfter": "You can try again in {{seconds}} seconds.",
     "analyzeSubtitle": "Analyze how discoverable, readable and actionable your website is for AI agents.",
     "anyWebsite": "Any public website reachable over HTTPS.",
     "urlPlaceholder": "https://example.com",

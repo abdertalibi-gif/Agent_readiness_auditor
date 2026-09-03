@@ -1340,7 +1340,8 @@
     "urlPlaceholder": "https://example.com",
     "scopeTitle": "Périmètre de l’audit",
     "scopeDesc": "Plus de pages signifie un score plus représentatif.",
-    "pages": "pages"
+    "pages": "pages",
+    "retryAfter": "Vous pourrez réessayer dans {{seconds}} secondes."
   },
   "websiteDetail": {
     "auditCountLast": "{count} audit(s) · le {date}",

@@ -1357,6 +1357,7 @@
     "deepTagline": "Análisis detallado",
     "enterUrl": "Por favor ingresa la URL de un sitio web",
     "startFailed": "No se pudo iniciar la auditoría. Inténtalo de nuevo.",
+    "retryAfter": "Puedes intentarlo de nuevo en {{seconds}} segundos.",
     "analyzeSubtitle": "Analiza la descubribilidad, legibilidad y accionabilidad de tu sitio para agentes de IA.",
     "anyWebsite": "Cualquier sitio web público accesible vía HTTPS.",
     "urlPlaceholder": "https://example.com",
