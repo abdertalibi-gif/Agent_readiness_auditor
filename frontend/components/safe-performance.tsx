@@ -27,7 +27,7 @@ export function SafePerformance() {
     // Also wrap PerformanceObserver callback if used directly
     const origObserver = window.PerformanceObserver;
     if (origObserver) {
-      const Wrapped = function (this: PerformanceObserver, callback: PerformanceObserverCallback, options?: PerformanceObserverInit) {
+      const Wrapped = function (this: PerformanceObserver, callback: PerformanceObserverCallback) {
         const safeCallback: PerformanceObserverCallback = (list, observer) => {
           try {
             // Filter out entries without startTime

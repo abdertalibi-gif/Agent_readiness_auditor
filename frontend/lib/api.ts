@@ -32,12 +32,12 @@ import type {
 import type { LoginInput, RegisterInput, TokenResponse, User } from "@/lib/auth";
 import { clearSession, getToken } from "@/lib/auth";
 
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api";
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 
 const REQUEST_TIMEOUT_MS = 30_000;
 
 export const CONNECTION_ERROR_MESSAGE =
-  "Unable to reach the server. Please check that the backend is running on http://localhost:8000 and try again.";
+  "Unable to reach the server. Please check your connection and try again.";
 
 function isConnectionError(err: unknown): boolean {
   // AbortError = our timeout fired. TypeError = fetch network failure

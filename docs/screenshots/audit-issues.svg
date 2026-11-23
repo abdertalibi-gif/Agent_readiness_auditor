@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+  <rect width="1200" height="675" fill="#f8fafc"/>
+  <!-- Left Sidebar -->
+  <rect x="0" y="0" width="220" height="675" fill="#0f172a"/>
+  <text x="28" y="42" font-size="15" font-weight="700" fill="#ffffff">Agent Readiness</text>
+  <text x="28" y="60" font-size="11" font-weight="500" fill="#94a3b8">Audit Workspace</text>
+
+  <text x="28" y="114" font-size="13" font-weight="500" fill="#cbd5e1">Overview</text>
+  <rect x="14" y="134" width="192" height="36" rx="8" fill="#1e293b"/>
+  <text x="28" y="157" font-size="13" font-weight="600" fill="#ffffff">Issues &amp; Findings</text>
+  <text x="28" y="197" font-size="13" font-weight="500" fill="#cbd5e1">Crawled Pages</text>
+  <text x="28" y="237" font-size="13" font-weight="500" fill="#cbd5e1">Recommendations</text>
+  <text x="28" y="277" font-size="13" font-weight="500" fill="#cbd5e1">PDF Reports</text>
+
+  <!-- Main Header -->
+  <text x="260" y="48" font-size="22" font-weight="700" fill="#0f172a">Audit Findings &amp; Recommendations</text>
+
+  <!-- Filter Bar -->
+  <rect x="260" y="72" width="54" height="32" rx="8" fill="#e2e8f0"/>
+  <text x="287" y="93" font-size="12" font-weight="600" fill="#0f172a" text-anchor="middle">All</text>
+
+  <rect x="322" y="72" width="76" height="32" rx="8" fill="#fee2e2" stroke="#fca5a5"/>
+  <text x="360" y="93" font-size="12" font-weight="600" fill="#b91c1c" text-anchor="middle">Fail (4)</text>
+
+  <rect x="406" y="72" width="102" height="32" rx="8" fill="#fef3c7" stroke="#fcd34d"/>
+  <text x="457" y="93" font-size="12" font-weight="600" fill="#b45309" text-anchor="middle">Warning (8)</text>
+
+  <rect x="516" y="72" width="84" height="32" rx="8" fill="#dcfce7" stroke="#86efac"/>
+  <text x="558" y="93" font-size="12" font-weight="600" fill="#15803d" text-anchor="middle">Pass (42)</text>
+
+  <rect x="970" y="72" width="190" height="32" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+  <text x="986" y="93" font-size="12" font-weight="500" fill="#475569">Severity: All levels</text>
+
+  <!-- Card 1: FAIL -->
+  <rect x="260" y="124" width="900" height="214" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+  <rect x="284" y="144" width="52" height="22" rx="6" fill="#ef4444"/>
+  <text x="310" y="159" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">FAIL</text>
+  <rect x="1084" y="144" width="52" height="22" rx="6" fill="#fee2e2"/>
+  <text x="1110" y="159" font-size="11" font-weight="700" fill="#b91c1c" text-anchor="middle">HIGH</text>
+
+  <text x="284" y="192" font-size="16" font-weight="700" fill="#0f172a">AI Crawler Directives Missing in robots.txt</text>
+  <text x="284" y="216" font-size="13" fill="#475569">No explicit crawl rules found for AI user agents (GPTBot, ClaudeBot, PerplexityBot) or sitemap declaration.</text>
+
+  <rect x="284" y="234" width="852" height="84" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="302" y="256" font-size="12" font-weight="700" fill="#0f172a">How to Fix</text>
+  <text x="302" y="278" font-size="12" fill="#334155">• Add explicit Allow/Disallow directives in /robots.txt for AI crawlers and reference your XML sitemap.</text>
+  <text x="302" y="298" font-size="12" fill="#334155">• Publish a concise /llms.txt index pointing agents to canonical documentation and product pages.</text>
+
+  <!-- Card 2: WARNING -->
+  <rect x="260" y="356" width="900" height="148" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+  <rect x="284" y="376" width="76" height="22" rx="6" fill="#f59e0b"/>
+  <text x="322" y="391" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">WARNING</text>
+  <rect x="1068" y="376" width="68" height="22" rx="6" fill="#fef3c7"/>
+  <text x="1102" y="391" font-size="11" font-weight="700" fill="#b45309" text-anchor="middle">MEDIUM</text>
+
+  <text x="284" y="424" font-size="16" font-weight="700" fill="#0f172a">Incomplete JSON-LD Schema Coverage</text>
+  <text x="284" y="448" font-size="13" fill="#475569">Homepage exposes Organization schema, but 3 of 5 crawled product pages lack structured Product/FAQ JSON-LD.</text>
+  <text x="284" y="476" font-size="12" font-weight="600" fill="#1d4ed8">Recommendation: Embed valid application/ld+json blocks with canonical @id and offer pricing fields.</text>
+
+  <!-- Card 3: PASS -->
+  <rect x="260" y="522" width="900" height="114" rx="12" fill="#ffffff" stroke="#e2e8f0"/>
+  <rect x="284" y="542" width="54" height="22" rx="6" fill="#10b981"/>
+  <text x="311" y="557" font-size="11" font-weight="700" fill="#ffffff" text-anchor="middle">PASS</text>
+  <rect x="1084" y="542" width="52" height="22" rx="6" fill="#dcfce7"/>
+  <text x="1110" y="557" font-size="11" font-weight="700" fill="#15803d" text-anchor="middle">INFO</text>
+
+  <text x="284" y="590" font-size="16" font-weight="700" fill="#0f172a">HTTPS, Canonical URLs &amp; Security Headers Configured</text>
+  <text x="284" y="614" font-size="13" fill="#475569">All crawled pages resolve over TLS with valid canonical tags, HSTS, and X-Content-Type-Options headers.</text>
+</svg>
